@@ -1,0 +1,118 @@
+generated: '2026-08-25'
+method: searched
+source: >-
+  https://docs.lvt.com/r/lvt-partner-api-manual (topic "WEBHOOKS FOR THE PARTNER API"),
+  https://github.com/LiveViewTech/lvt-public-api/blob/master/examples/webhooks/README.md,
+  openapi/lvt-partner-api-openapi.yml
+asyncapi_spec_published: false
+asyncapi_probes:
+- url: https://api.lvt.com/asyncapi.yaml
+  status: 404
+- url: https://www.lvt.com/asyncapi.yaml
+  status: 404
+- url: https://raw.githubusercontent.com/LiveViewTech/lvt-public-api/master/api-specs/asyncapi.yaml
+  status: 404
+note: >-
+  LVT publishes no AsyncAPI document. It does publish a real, well-specified webhook surface — CRUD
+  endpoints in the OpenAPI plus a dedicated manual topic covering registration, validation, HMAC
+  signature verification, retry/disable behaviour and the full action catalog. That catalog is captured
+  below verbatim from LVT's own documentation; nothing is invented. Type `Webhooks` is emitted;
+  `AsyncAPI` is NOT, because no AsyncAPI spec exists.
+transport:
+  protocol: HTTPS POST to a subscriber-registered URL
+  url_requirement: 'The registered URL MUST be HTTPS. HTTP is explicitly disallowed.'
+  content_type: application/json
+management:
+  register: 'POST /webhooks  (body: {url, namespace, enabled})'
+  list: GET /webhooks
+  read: GET /webhooks/{webhookId}
+  update: PATCH /webhooks/{webhookId}
+  delete: DELETE /webhooks/{webhookId}
+  test: 'POST /webhooks:test  (validates a URL and fires a real signed test payload without creating a resource)'
+  validation_on_write: >-
+    The URL is tested on create AND on update regardless of the `enabled` value. On PATCH, if the url
+    changes or enabled flips false -> true, a test notification must be answered with an HTTP 2xx for
+    the update to execute.
+  test_helpers:
+  - name: action
+    in: query
+    description: >-
+      Optional. When a valid action is supplied, the test message's `data` field matches that action's
+      documented example (timestamps generated at request time). Defaults to the `test` action.
+  - name: data
+    in: body
+    description: >-
+      Optional object, otherwise unvalidated. Overrides the `data` value of the test message so a
+      developer can replay a realistic payload against their own handler.
+  - name: mimeType
+    in: query
+    description: >-
+      Only affects the mediaAvailable action when no data field is given. Toggles image vs video;
+      valid values image/jpeg and video/mp4 (defaults to video). The media IDs correspond to a real
+      image and video usable for development.
+security:
+  signature_headers:
+  - name: X-LVT-HMAC-SHA256
+    description: Signature over the entire stringified request body, base64-encoded
+  - name: X-LVT-PUBKEY-URL
+    description: 'URL of the signing public key; always points at GET /publicKeys/{publicKeyId}'
+  algorithm: SHA256
+  key_format: application/x-pem-file
+  key_endpoint_authenticated: true
+  key_rotation: 'LVT states the public key does not change over time and REQUIRES consumers to cache and reuse it.'
+  verification_example: >-
+    LVT publishes a Node.js crypto (createVerify) Express handler example in both the manual and the
+    GitHub repo.
+delivery:
+  success_criteria: 'Any HTTP 2XX response.'
+  retry: 'Exponential backoff waiting `attempt ^ 2` seconds, up to 10 attempts.'
+  per_message: 'Each message retries individually — one failing message can disable the webhook even if later messages succeeded.'
+  auto_disable: 'After 10 failed attempts the webhook is DISABLED. No notification is sent.'
+  recovery: 'Re-enable with PATCH /webhooks/{webhookId}.'
+  while_disabled: 'No further security alerts are delivered until it is re-enabled.'
+envelope:
+  fields:
+    action: 'string — the action that prompted the message'
+    attempt: 'integer 1-10 — number of times this message has been sent'
+    currentAttemptTimestamp: 'ISO-8601 string — timestamp of the current attempt'
+    data: 'object — payload; schema is determined by `action`'
+    initialAttemptTimestamp: 'ISO-8601 string — only present when the current attempt is not the first'
+    namespace: 'string — namespace of the registered webhook that triggered the event'
+  example:
+    action: eventRaised
+    attempt: 3
+    currentAttemptTimestamp: '2024-01-16T19:34:16.335Z'
+    data: {}
+    initialAttemptTimestamp: '2024-01-16T18:33:15.335Z'
+    namespace: securityAlerts
+namespaces:
+- name: securityAlerts
+  status: 'the only namespace currently supported; the field exists to allow future expansion'
+event_count: 7
+events:
+- action: alertRaised
+  description: A new alert has been reported by a Live Unit.
+- action: alertTypeChanged
+  description: The type of an alert has changed.
+- action: eventRaised
+  description: >-
+    A new event has been reported by a Live Unit. This is the first message in the context of an event;
+    its data field matches the GET /alerts/events/{id} response shape (alerts[], client, eventTime, id,
+    liveUnit, location, notes[], priority, resolution).
+- action: mediaAvailable
+  description: Media associated with an alert has been uploaded.
+- action: noteAdded
+  description: A user has added a note to the event.
+- action: resolved
+  description: A user has resolved the event.
+- action: userAssigned
+  description: A user has been assigned to investigate the event.
+aggregation_model: >-
+  LVT's stated intent is that a consumer can reconstruct a full event — as if fetched via
+  GET /alerts/events/{id} — by applying the series of webhook messages: payload schemas are shaped so
+  they can be dropped into existing arrays or replace event/alert fields.
+media_handling: >-
+  The media schema deliberately contains NO URL. Media is only reachable through a signed URL requested
+  from GET /alerts/media/{mediaId}/url, and that signed URL expires after 30 minutes. (The webhooks
+  topic refers to this endpoint as GET /media/{mediaId}/url; the OpenAPI path is
+  /alerts/media/{mediaId}/url — a documentation discrepancy, recorded as observed.)

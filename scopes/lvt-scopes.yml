@@ -1,0 +1,28 @@
+generated: '2026-08-25'
+method: derived
+source: openapi/lvt-partner-api-openapi.yml
+schemes:
+- name: OAuth2
+  source: openapi/lvt-partner-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://api.lvt.com/oauth2/v1/token
+scopes:
+- scope: account.cameras.manage
+  description: Edit a cameras data
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/lvt-partner-api-openapi.yml
+- scope: account.liveUnits.manage
+  description: Edit a live units data
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/lvt-partner-api-openapi.yml
+- scope: account.locations.manage
+  description: Edit a locations data
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/lvt-partner-api-openapi.yml

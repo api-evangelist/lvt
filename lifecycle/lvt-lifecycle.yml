@@ -1,0 +1,58 @@
+generated: '2026-08-25'
+method: searched
+source: >-
+  https://docs.lvt.com/r/lvt-partner-api-manual, https://github.com/LiveViewTech/lvt-public-api,
+  openapi/lvt-partner-api-openapi.yml, https://status.lvt.com/
+versioning:
+  scheme: url-path + semver in the contract
+  current_version: 1.0.1
+  spec_declared_version: 1.0.1
+  manual_declared_version: 1.0.0
+  version_in_path: /v1
+  base_url: https://api.lvt.com/v1
+  note: >-
+    The OpenAPI document declares info.version 1.0.1 while the Partner API manual header still reads
+    "VERSION 1.0.0" — the two published surfaces disagree by a patch. The single server entry is
+    labelled "Production beta version", so LVT itself describes the v1 surface as beta.
+  stability: 'production beta (per servers[0].description: "Production beta version")'
+deprecation:
+  policy_published: false
+  policy_url: null
+  sunset_header: unknown
+  deprecation_header: unknown
+  rfc8594: not documented
+  deprecated_operations: []
+  note: >-
+    No deprecation or sunset policy is published anywhere in LVT's public material — not in the Partner
+    API manual, not in the GitHub repo, not on lvt.com. No operation in the OpenAPI carries
+    `deprecated: true`. The only forward-compatibility signal in the contract is the webhook `namespace`
+    field, which the docs say exists "to allow for future expansion". No `Deprecation` pointer is
+    emitted because there is no deprecation policy to point at.
+change_log:
+  published: false
+  note: >-
+    LVT publishes no dated API changelog. The Fluid Topics documentation portal exposes per-publication
+    edition dates (the Partner API manual last edition 2026-06-17, published 2026-07-15) and the GitHub
+    repo carries commit history, but neither is a maintained release note stream. No ChangeLog pointer.
+sla:
+  published: false
+  note: >-
+    No numeric SLA (uptime %, credits) is published publicly. The pricing page makes a marketing claim
+    of "industry-leading uptime" and says "All plans include LVT's SOC 2 Type II certified platform".
+    Contractual terms sit in the Master Services Agreement at https://www.lvt.com/legal/msa.
+status_page:
+  published: true
+  url: https://status.lvt.com/
+  status: 200
+  subscribe: email and SMS incident notifications, with OTP-verified subscription
+  machine_readable_feed: not advertised on the page
+  probed: '2026-08-25'
+runtime_lifecycle:
+  note: >-
+    The one genuinely lifecycle-shaped runtime object in this API is the stream. StartStream
+    (POST /cameras/{cameraId}/streams) creates a stream that AUTO-EXPIRES; CheckIn
+    (POST /streams/{streamId}:checkIn) extends it on the server-provided refreshInterval; CheckOut
+    (DELETE /streams/{streamId}) ends it. After expiry or checkout, further checkIn/DELETE on that
+    streamId return 404. Webhook endpoints have their own decay path: an endpoint that fails to return
+    2xx is retried with exponential backoff (attempt ^ 2 seconds) and is AUTOMATICALLY DISABLED after
+    10 failed attempts, with no notification sent; it must be re-enabled with PATCH /webhooks/{webhookId}.

@@ -1,0 +1,200 @@
+generated: '2026-08-25'
+method: searched
+source: >-
+  https://docs.lvt.com/r/lvt-partner-api-manual (topics: LVT PARTNER API DOCUMENTATION, STREAMING WITH
+  THE PARTNER API, WEBHOOKS FOR THE PARTNER API, WEBRTC FOR THE PARTNER API),
+  https://github.com/LiveViewTech/lvt-public-api, openapi/lvt-partner-api-openapi.yml
+api_style:
+  protocol: REST over HTTPS, JSON payloads
+  spec: OpenAPI 3.0.3
+  base_url: https://api.lvt.com/v1
+  gateway: Tyk data plane behind Istio/Envoy (observed via server + x-envoy-decorator-operation headers)
+  custom_methods:
+    style: 'Google AIP-136 style colon custom verbs'
+    delimiter: ':'
+    examples:
+    - POST /liveUnits/{liveUnitId}:call
+    - POST /liveUnits/{liveUnitId}/sounds/{soundId}:play
+    - POST /liveUnits/{liveUnitId}/lights/{lightId}:toggle
+    - POST /streams/{streamId}:checkIn
+    - POST /alerts/events/{id}:addNote
+    - POST /alerts/events/{id}:resolve
+    - POST /alerts/events/{id}:assignUser
+    - POST /webhooks:test
+    note: >-
+      The docs are explicit that the colon is a URL delimiter and the exact suffix (e.g. ":checkIn")
+      must appear at the end of the request URL. 8 of 33 operations use this form.
+authentication:
+  style: OAuth 2.0 client credentials -> short-lived JWT bearer token
+  token_url: https://api.lvt.com/oauth2/v1/token
+  provider: Okta (LVT's Okta authorization server; the console/VMS tenant is lvt-auth.okta.com)
+  client_credential_encoding: 'Basic base64(CLIENT_ID:CLIENT_SECRET) on the token request'
+  grant_type: client_credentials
+  token_lifetime_seconds: 3600
+  request_header: 'Authorization: Bearer <access_token>'
+  scopes:
+  - account.liveUnits.manage
+  - account.cameras.manage
+  - account.locations.manage
+  access_model: >-
+    Partnership-gated. An account admin requests access through their LVT account representative;
+    LVT issues the client ID and secret (integrations@lvt.com). RBAC state as documented (Feb 19, 2025):
+    a client has access to ALL units/locations defined in its client configuration at LVT — there is no
+    per-unit scoping in the token.
+  detail: authentication/lvt-authentication.yml
+content_negotiation:
+  accept_required: true
+  note: >-
+    The API returns 406 when the Accept header is absent or does not contain "application/json" —
+    that is spelled out in components.responses.406 and is applied to 3 operations.
+pagination:
+  style: cursor
+  request_params:
+  - name: limit
+    in: query
+    description: page size, integer 1-100
+    note: 'The reusable parameter component is named `count` but the wire parameter name is `limit`.'
+  - name: cursor
+    in: query
+    description: >-
+      opaque cursor; the docs say "Do not provide on initial request. Reserved for use by backend to
+      paginate." — callers are expected to follow nextCursorUri rather than construct it.
+  response_fields:
+  - itemsCount
+  - nextCursorUri
+  - totalResults
+  next_page: 'Follow the absolute URL in nextCursorUri (nullable when exhausted).'
+  applies_to:
+  - GetLiveUnits
+  - GetLiveUnitCameras
+  - GetLocations
+  - GetLocationLiveUnits
+field_expansion:
+  supported: false
+  note: No expand / fields / sparse-fieldset parameter exists anywhere in the contract.
+metadata:
+  supported: false
+  note: No customer-defined metadata bag on any resource.
+request_tracing:
+  request_id_header: null
+  correlation_field: errorId
+  note: >-
+    There is no documented request-id request or response header. The only tracing handle LVT gives a
+    caller is `errorId` inside the error envelope, which LVT maps to the internal server-side error.
+    That handle exists ONLY on failures — a successful call is untraceable from the client side.
+versioning:
+  in_path: /v1
+  detail: lifecycle/lvt-lifecycle.yml
+error_envelope:
+  media_type: application/json
+  shape: 'Okta-style {errorCode, errorSummary, errorId, errorCauses[]}'
+  rfc9457: false
+  detail: errors/lvt-problem-types.yml
+rate_limit_signaling:
+  headers_documented: none
+  status_on_exhaustion: not documented
+  note: >-
+    No 429 response is declared on ANY of the 33 operations, and no X-RateLimit-*/RateLimit-*/Retry-After
+    header is documented. The only statement is prose in the webhooks topic: "Use of LVT's Partner API is
+    metered, and LVT can block clients who spam or flood the service." An agent therefore has no runtime
+    signal to back off on. See rate-limits/lvt-rate-limits.yml.
+idempotency:
+  supported: false
+  header: null
+  scope: null
+  retention: null
+  note: >-
+    LVT documents NO idempotency mechanism: there is no Idempotency-Key header, no client-supplied
+    request key, and no statement about safe retries anywhere in the Partner API manual, the GitHub
+    README or the OpenAPI. This matters more here than in most APIs because several write operations are
+    PHYSICAL and non-compensating: PlayLiveUnitSound emits sound at a real site, ToggleLiveUnitLight
+    flips a floodlight/strobe, TalkDownStart opens a live speaker channel, and UpdateCameraPosition
+    slews a real PTZ camera. A duplicate POST from a retrying agent takes the action twice. Some of the
+    physical actions happen to be self-limiting (toggle is a two-state flip; a sound is a fixed clip),
+    but that is a property of the device, not a guarantee in the contract. NO `Idempotency` pointer is
+    emitted, because there is nothing to point at.
+reversibility:
+  grade: documented
+  credit_basis: >-
+    A reversal path exists and is documented for the stream and webhook surfaces, and the retry/disable
+    behaviour of webhooks is stated precisely. NO reversal WINDOW is stated for any operation, so this
+    grades `documented` (0.4) and not `verified` (1.0). No window is asserted here that LVT does not
+    publish.
+  write_surface: true
+  surfaces:
+  - resource: stream
+    create: 'StartStream — POST /cameras/{cameraId}/streams'
+    reverse: 'CheckOut — DELETE /streams/{streamId}'
+    window: >-
+      Not stated numerically. The docs say a stream "will automatically timeout after a certain period
+      of time" unless CheckIn is called on the server-supplied refreshInterval (example value 10000 ms),
+      and that "the actual timeout duration is longer than the recommended refresh interval so one or
+      two missed check-ins will not immediately drop the stream". The concrete timeout is NOT published.
+    after_reversal: 'Subsequent checkIn or DELETE on the same streamId return 404.'
+    docs: https://docs.lvt.com/r/lvt-partner-api-manual
+    reversible: true
+  - resource: webhook
+    create: 'POST /webhooks'
+    reverse: 'DELETE /webhooks/{webhookId}; PATCH /webhooks/{webhookId} to disable/re-enable via `enabled`'
+    window: 'None stated — delete/disable is available at any time.'
+    docs: https://docs.lvt.com/r/lvt-partner-api-manual
+    reversible: true
+    note: >-
+      LVT also auto-disables a webhook after 10 consecutive non-2xx delivery attempts (exponential
+      backoff of attempt ^ 2 seconds) and sends NO notification when it does. Re-enabling is the
+      caller's job via PATCH. That is a stated, dated rule and is the most precisely specified
+      lifecycle behaviour in the whole contract.
+  - resource: alert event
+    create: 'POST /alerts/events/{id}:resolve (state change), POST /alerts/events/{id}:addNote, POST /alerts/events/{id}:assignUser'
+    reverse: null
+    window: null
+    reversible: unknown
+    note: >-
+      No un-resolve, un-assign or delete-note operation exists in the contract, and the docs do not say
+      whether resolving an event can be undone. Recorded as unknown rather than guessed.
+  - resource: camera position (PTZF)
+    create: 'UpdateCameraPosition — PUT /cameras/{cameraId}/position; UpdateCameraPosition2 — PATCH /cameras/{cameraId}/position'
+    reverse: 'Read GET /cameras/{cameraId}/position first and re-PUT the prior PTZF values — a caller-side restore, not a provider-published undo.'
+    window: 'Not applicable — the operation is a state set, not a transaction.'
+    reversible: true
+    note: >-
+      This is the one write an agent CAN safely rehearse-and-restore, because the current position is
+      readable before the change. Nothing in the docs frames it that way; it is derived from the
+      GET/PUT pair on the same path.
+  - resource: physical actuation (sound, light, talk-down)
+    create: 'PlayLiveUnitSound, ToggleLiveUnitLight, TalkDownStart'
+    reverse: 'ToggleLiveUnitLight is self-inverse (it toggles state). Sound playback and talk-down have no documented stop/cancel operation.'
+    window: null
+    reversible: partial
+    note: >-
+      These reach the physical world. A sound played at a site cannot be un-played, and there is no
+      documented operation to end a talk-down call once TalkDownStart has been issued. An agent should
+      treat these as irreversible.
+dry_run_mode:
+  supported: partial
+  note: >-
+    There is exactly one dry-run affordance in the API and it is well designed: POST /webhooks:test
+    validates a receiver URL and fires a real signed test payload WITHOUT creating any resource, and a
+    204 from it means a subsequent POST /webhooks will succeed. No other operation has a dry-run,
+    preview or simulate mode — notably none of the physical actuation operations do.
+webhook_signing:
+  headers:
+  - name: X-LVT-HMAC-SHA256
+    description: HMAC signature over the entire stringified request body, base64-encoded
+  - name: X-LVT-PUBKEY-URL
+    description: URL of the public key used to sign; always points at GET /publicKeys/{publicKeyId}
+  algorithm: SHA256
+  key_endpoint: 'GET /publicKeys/{publicKeyId} (returns application/x-pem-file)'
+  key_endpoint_is_authenticated: true
+  caching_requirement: >-
+    LVT explicitly requires callers to cache and reuse the public key — "LVT's public key does not change
+    over time" — and warns that the Partner API is metered and flooding clients can be blocked.
+  detail: asyncapi/lvt-webhooks.yml
+cross_links:
+  errors: errors/lvt-problem-types.yml
+  lifecycle: lifecycle/lvt-lifecycle.yml
+  authentication: authentication/lvt-authentication.yml
+  scopes: scopes/lvt-scopes.yml
+  rate_limits: rate-limits/lvt-rate-limits.yml
+  webhooks: asyncapi/lvt-webhooks.yml
+  data_model: data-model/lvt-data-model.yml

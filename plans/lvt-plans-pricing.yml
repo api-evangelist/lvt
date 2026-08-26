@@ -1,0 +1,52 @@
+generated: '2026-08-25'
+method: searched
+source: https://www.lvt.com/pricing
+plan_count: 2
+currency: USD
+billing_model: >-
+  LVT sells physical mobile security units (MSUs) as an annual subscription that bundles hardware,
+  installation, connectivity and the SaaS platform. Pricing is per-unit and per-year, not per-API-call.
+  The Partner API is not separately priced or metered on the public pricing page — API access is granted
+  under a partnership agreement (integrations@lvt.com), and the pricing page does not mention it.
+plans:
+- name: Site Awareness Focused MSU
+  label: Limited Offer
+  price: 12000
+  currency: USD
+  period: year
+  billing: Paid up front annually
+  includes:
+  - Single camera
+  - Strobe light
+  - Live streaming and perimeter visibility
+  - Incident review via video recording
+  - Active strobe-light deterrence
+  quota: null
+  overage: null
+  note: >-
+    Described by LVT as "a streamlined, budget-friendly unit ... built specifically to give you perimeter
+    visibility and live streaming". Price is published verbatim on the pricing page.
+- name: Security & Intelligence Focused MSU
+  label: Future Proofed
+  price: null
+  price_disclosed: false
+  currency: USD
+  period: year
+  billing: 'Contact sales ("Talk to Sales"); custom configuration required after consultation'
+  includes:
+  - Everything in Site Awareness Focused MSU
+  - Multi-camera unit with additional camera combinations
+  - Automated alerts for unwanted activity and behavior
+  - AI talk down, dynamic spotlight, multi-color strobes
+  - Natural-language search over recorded video
+  - App-based escalation for shift workers and guests
+  quota: null
+  overage: null
+platform_claims:
+  - 'All plans include LVT''s SOC 2 Type II certified platform and industry-leading uptime. (verbatim, https://www.lvt.com/pricing)'
+api_pricing:
+  published: false
+  note: >-
+    No published price, tier or quota for the Partner API itself. The API manual states the prerequisites
+    are "an account with LVT" and "a partnership agreement with LVT", and that access is requested by
+    emailing integrations@lvt.com — a sales-gated, unpriced surface.

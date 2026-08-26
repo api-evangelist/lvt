@@ -1,0 +1,32 @@
+generated: '2026-08-25'
+method: probed
+source: https://trust.lvt.com/ (linked as "Trust Center" from the www.lvt.com site footer)
+status: published-but-unreadable
+url: https://trust.lvt.com/
+http_status: 403
+http_status_note: >-
+  Cloudflare interstitial ("Just a moment... Enable JavaScript and cookies to continue"). Returned 403
+  to both a plain crawler and a browser User-Agent fetch. This is a bot challenge, not a dead page —
+  the host resolves, serves a challenge, and is linked from LVT's own footer. The certification list on
+  the other side could not be read, so NO certifications are asserted from this source.
+certifications_read: []
+certifications_claimed_elsewhere:
+- name: SOC 2 Type II
+  source: 'https://www.lvt.com/pricing — "All plans include LVT''s SOC 2 Type II certified platform"'
+  verified_at_trust_center: false
+related_security_pages:
+- url: https://www.lvt.com/legal/security
+  title: 'LVT: Secure By Design'
+  status: 200
+  note: >-
+    A marketing/collateral page whose substantive content is a downloadable PDF one-pager
+    ("Cyber Security One Pager") hosted on the Webflow CDN, not a structured control list.
+- url: https://www.lvt.com/legal/vdp
+  title: Vulnerability Disclosure Policy
+  status: 200
+- url: https://www.lvt.com/legal/msa
+  title: Master Services Agreement
+  status: 200
+- url: https://www.lvt.com/commitment-to-privacy
+  title: Commitment to Privacy
+  status: unprobed

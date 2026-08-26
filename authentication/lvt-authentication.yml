@@ -1,0 +1,17 @@
+generated: '2026-08-25'
+method: derived
+source: openapi/lvt-partner-api-openapi.yml
+summary:
+  types:
+  - oauth2
+  oauth2_flows:
+  - clientCredentials
+schemes:
+- name: OAuth2
+  type: oauth2
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://api.lvt.com/oauth2/v1/token
+    scopes: 3
+  sources:
+  - openapi/lvt-partner-api-openapi.yml

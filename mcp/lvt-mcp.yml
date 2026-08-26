@@ -1,0 +1,302 @@
+generated: '2026-08-25'
+method: derived
+status: candidate
+source: openapi/lvt-partner-api-openapi.yml
+search_result:
+  official_hosted_server: none
+  probes:
+  - url: https://mcp.lvt.com/mcp
+    method: POST tools/list
+    status: 0
+    note: host does not resolve (NXDOMAIN)
+  - url: https://api.lvt.com/mcp
+    method: POST tools/list
+    status: 404
+  - url: https://www.lvt.com/mcp
+    method: POST tools/list
+    status: 405
+  - url: https://docs.lvt.com/mcp
+    method: POST tools/list
+    status: 405
+    note: Fluid Topics SPA catch-all; rejects POST
+  first_party_mcp_elsewhere:
+  - name: junto-memory
+    url: https://github.com/LiveViewTech/junto-memory
+    description: Persistent shared memory and coordination MCP server for multi-agent AI workflows (MongoDB
+      + ChromaDB), part of LiveViewTech's internal "Junto" system.
+    first_party: true
+    relates_to_lvt_api: false
+    note: Published by the LiveViewTech GitHub org and genuinely first-party, but it is internal AI-engineering
+      tooling. It exposes NO LVT Partner API capability and is NOT an agent surface onto LVT units, cameras,
+      streams or alerts. Recorded so the distinction is on the record; it is not the basis of this manifest.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: probed
+note: 'LVT ships no MCP server for the Partner API. The tools below are a DERIVED CANDIDATE surface: one
+  tool per OpenAPI operation in openapi/lvt-partner-api-openapi.yml (v1.0.1, 33 operations). Nothing here
+  is published by LVT and no endpoint is asserted. Tools whose backing operation has no operationId in
+  the spec are named from method+path and flagged; those 13 operations (alerts, media, webhooks, publicKeys)
+  are a real gap in LVT''s own contract, not ours.'
+server:
+  name: lvt
+  transport: null
+  url: null
+auth:
+  model: oauth2 client_credentials
+  token_url: https://api.lvt.com/oauth2/v1/token
+  scopes:
+  - account.liveUnits.manage
+  - account.cameras.manage
+  - account.locations.manage
+  note: Access requires an LVT partnership agreement; client ID/secret are issued by LVT (integrations@lvt.com).
+tool_count: 33
+tools:
+- name: lvt_get_live_units
+  category: LiveUnits
+  description: This endpoint returns all the live units accessible by the specified client.
+  rest_operation: GET /liveUnits
+  operationId: GetLiveUnits
+  scopes:
+  - account.liveUnits.manage
+  read_only: true
+- name: lvt_get_live_unit
+  category: LiveUnits
+  description: Details for the specified live unit.
+  rest_operation: GET /liveUnits/{liveUnitId}
+  operationId: GetLiveUnit
+  scopes:
+  - account.liveUnits.manage
+  read_only: true
+- name: lvt_get_live_unit_call_info
+  category: LiveUnits
+  description: Get information on how to make a call to the live unit
+  rest_operation: GET /liveUnits/{liveUnitId}/callInfo
+  operationId: GetLiveUnitCallInfo
+  scopes: null
+  read_only: true
+- name: lvt_get_live_unit_cameras
+  category: LiveUnits
+  description: List of user accessible cameras hosted by the given liveUnit.
+  rest_operation: GET /liveUnits/{liveUnitId}/cameras
+  operationId: GetLiveUnitCameras
+  scopes:
+  - account.cameras.manage
+  read_only: true
+- name: lvt_get_live_unit_sounds
+  category: LiveUnits
+  description: List of quick sounds that can be played by the live unit
+  rest_operation: GET /liveUnits/{liveUnitId}/sounds
+  operationId: GetLiveUnitSounds
+  scopes: null
+  read_only: true
+- name: lvt_talk_down_start
+  category: LiveUnits
+  description: Initiate a speaker talk-down call
+  rest_operation: POST /liveUnits/{liveUnitId}:call
+  operationId: TalkDownStart
+  scopes: null
+  read_only: false
+- name: lvt_play_live_unit_sound
+  category: LiveUnits
+  description: Play a quick sound from a live unit
+  rest_operation: POST /liveUnits/{liveUnitId}/sounds/{soundId}:play
+  operationId: PlayLiveUnitSound
+  scopes: null
+  read_only: false
+- name: lvt_get_live_unit_lights
+  category: LiveUnits
+  description: List of lights on the live unit
+  rest_operation: GET /liveUnits/{liveUnitId}/lights
+  operationId: GetLiveUnitLights
+  scopes: null
+  read_only: true
+- name: lvt_toggle_live_unit_light
+  category: LiveUnits
+  description: Toggle the status of a light on a live unit
+  rest_operation: POST /liveUnits/{liveUnitId}/lights/{lightId}:toggle
+  operationId: ToggleLiveUnitLight
+  scopes: null
+  read_only: false
+- name: lvt_get_live_unit_camera
+  category: Cameras
+  description: Details of selected camera.
+  rest_operation: GET /cameras/{cameraId}
+  operationId: GetLiveUnitCamera
+  scopes:
+  - account.cameras.manage
+  read_only: true
+- name: lvt_get_camera_position
+  category: Cameras
+  description: Returns the selected camera's PTZF values
+  rest_operation: GET /cameras/{cameraId}/position
+  operationId: GetCameraPosition
+  scopes:
+  - account.cameras.manage
+  read_only: true
+- name: lvt_update_camera_position
+  category: Cameras
+  description: Updates the selected camera's PTZF values
+  rest_operation: PUT /cameras/{cameraId}/position
+  operationId: UpdateCameraPosition
+  scopes:
+  - account.cameras.manage
+  read_only: false
+- name: lvt_update_camera_position2
+  category: Cameras
+  description: Updates the selected camera's PTZF values
+  rest_operation: PATCH /cameras/{cameraId}/position
+  operationId: UpdateCameraPosition2
+  scopes:
+  - account.cameras.manage
+  read_only: false
+- name: lvt_get_protocols
+  category: Cameras
+  description: Returns list of protocols supported
+  rest_operation: GET /cameras/{cameraId}/protocols
+  operationId: GetProtocols
+  scopes:
+  - account.cameras.manage
+  read_only: true
+- name: lvt_start_stream
+  category: Cameras
+  description: Start a stream
+  rest_operation: POST /cameras/{cameraId}/streams
+  operationId: StartStream
+  scopes:
+  - account.cameras.manage
+  read_only: false
+- name: lvt_check_in
+  category: Streams
+  description: Check in streaming for the camera
+  rest_operation: POST /streams/{streamId}:checkIn
+  operationId: CheckIn
+  scopes:
+  - account.cameras.manage
+  read_only: false
+- name: lvt_check_out
+  category: Streams
+  description: Check out streaming for the camera
+  rest_operation: DELETE /streams/{streamId}
+  operationId: CheckOut
+  scopes:
+  - account.cameras.manage
+  read_only: false
+- name: lvt_get_locations
+  category: Locations
+  description: List of locations for the user's client
+  rest_operation: GET /locations
+  operationId: GetLocations
+  scopes:
+  - account.locations.manage
+  read_only: true
+- name: lvt_get_location
+  category: Locations
+  description: Details for the specified location.
+  rest_operation: GET /locations/{locationId}
+  operationId: GetLocation
+  scopes:
+  - account.locations.manage
+  read_only: true
+- name: lvt_get_location_live_units
+  category: Locations
+  description: List of user accessible live units at the given location.
+  rest_operation: GET /locations/{locationId}/liveUnits
+  operationId: GetLocationLiveUnits
+  scopes:
+  - account.liveUnits.manage
+  read_only: true
+- name: lvt_get_alerts_events
+  category: Events
+  description: Get events
+  rest_operation: GET /alerts/events
+  operationId: null
+  scopes: null
+  read_only: true
+- name: lvt_get_alerts_events_id
+  category: Events
+  description: Get an event
+  rest_operation: GET /alerts/events/{id}
+  operationId: null
+  scopes: null
+  read_only: true
+- name: lvt_post_alerts_events_id_add_note
+  category: Events
+  description: Create a Note
+  rest_operation: POST /alerts/events/{id}:addNote
+  operationId: null
+  scopes: null
+  read_only: false
+- name: lvt_post_alerts_events_id_resolve
+  category: Events
+  description: Resolve an event
+  rest_operation: POST /alerts/events/{id}:resolve
+  operationId: null
+  scopes: null
+  read_only: false
+- name: lvt_post_alerts_events_id_assign_user
+  category: Events
+  description: Assign a user to an event
+  rest_operation: POST /alerts/events/{id}:assignUser
+  operationId: null
+  scopes: null
+  read_only: false
+- name: lvt_get_alerts_media_media_id_url
+  category: Media
+  description: Get a signed url for media
+  rest_operation: GET /alerts/media/{mediaId}/url
+  operationId: null
+  scopes: null
+  read_only: true
+- name: lvt_post_webhooks
+  category: Webhooks
+  description: Create a Webhook
+  rest_operation: POST /webhooks
+  operationId: null
+  scopes: null
+  read_only: false
+- name: lvt_get_webhooks
+  category: Webhooks
+  description: Get Webhooks
+  rest_operation: GET /webhooks
+  operationId: null
+  scopes: null
+  read_only: true
+- name: lvt_get_webhooks_webhook_id
+  category: Webhooks
+  description: Get a Webhook
+  rest_operation: GET /webhooks/{webhookId}
+  operationId: null
+  scopes: null
+  read_only: true
+- name: lvt_patch_webhooks_webhook_id
+  category: Webhooks
+  description: Update a Webhook
+  rest_operation: PATCH /webhooks/{webhookId}
+  operationId: null
+  scopes: null
+  read_only: false
+- name: lvt_delete_webhooks_webhook_id
+  category: Webhooks
+  description: Delete a Webhook
+  rest_operation: DELETE /webhooks/{webhookId}
+  operationId: null
+  scopes: null
+  read_only: false
+- name: lvt_post_webhooks_test
+  category: Webhooks
+  description: Test a Webhook
+  rest_operation: POST /webhooks:test
+  operationId: null
+  scopes: null
+  read_only: false
+- name: lvt_get_public_keys_public_key_id
+  category: PublicKeys
+  description: Get a Public Key
+  rest_operation: GET /publicKeys/{publicKeyId}
+  operationId: null
+  scopes: null
+  read_only: true

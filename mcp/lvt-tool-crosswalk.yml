@@ -1,0 +1,283 @@
+generated: '2026-08-25'
+method: derived
+source: openapi/lvt-partner-api-openapi.yml + mcp/lvt-mcp.yml
+note: LVT publishes no MCP server and no GraphQL endpoint, so this crosswalk binds the DERIVED candidate
+  MCP tools (mcp/lvt-mcp.yml) 1:1 to the REST operations they would wrap. Every row is direct/high confidence
+  because each candidate tool was generated FROM the operation it names. There are no mcp_only rows (no
+  MCP surface exists) and no rest_only rows (every operation is represented).
+surfaces:
+  openapi:
+    file: openapi/lvt-partner-api-openapi.yml
+    base: https://api.lvt.com/v1
+    gated: partnership agreement + OAuth2 client credentials
+  graphql:
+    endpoint: null
+    probed:
+    - https://api.lvt.com/graphql (400)
+    - https://api.lvt.com/v1/graphql (400)
+    note: The Tyk/Envoy gateway answers 400 "Authorization field missing" for unrouted paths; no GraphQL
+      surface is documented anywhere in LVT material.
+  mcp:
+    url: null
+    status: none published
+coverage:
+  rest_operations: 33
+  mcp_tools: 33
+  bound: 33
+  mcp_only: 0
+  rest_only: 0
+  operations_without_operationId: 13
+crosswalk:
+- tool: lvt_get_live_units
+  category: LiveUnits
+  rest:
+  - GetLiveUnits
+  rest_path: GET /liveUnits
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_live_unit
+  category: LiveUnits
+  rest:
+  - GetLiveUnit
+  rest_path: GET /liveUnits/{liveUnitId}
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_live_unit_call_info
+  category: LiveUnits
+  rest:
+  - GetLiveUnitCallInfo
+  rest_path: GET /liveUnits/{liveUnitId}/callInfo
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_live_unit_cameras
+  category: LiveUnits
+  rest:
+  - GetLiveUnitCameras
+  rest_path: GET /liveUnits/{liveUnitId}/cameras
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_live_unit_sounds
+  category: LiveUnits
+  rest:
+  - GetLiveUnitSounds
+  rest_path: GET /liveUnits/{liveUnitId}/sounds
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_talk_down_start
+  category: LiveUnits
+  rest:
+  - TalkDownStart
+  rest_path: POST /liveUnits/{liveUnitId}:call
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_play_live_unit_sound
+  category: LiveUnits
+  rest:
+  - PlayLiveUnitSound
+  rest_path: POST /liveUnits/{liveUnitId}/sounds/{soundId}:play
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_live_unit_lights
+  category: LiveUnits
+  rest:
+  - GetLiveUnitLights
+  rest_path: GET /liveUnits/{liveUnitId}/lights
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_toggle_live_unit_light
+  category: LiveUnits
+  rest:
+  - ToggleLiveUnitLight
+  rest_path: POST /liveUnits/{liveUnitId}/lights/{lightId}:toggle
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_live_unit_camera
+  category: Cameras
+  rest:
+  - GetLiveUnitCamera
+  rest_path: GET /cameras/{cameraId}
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_camera_position
+  category: Cameras
+  rest:
+  - GetCameraPosition
+  rest_path: GET /cameras/{cameraId}/position
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_update_camera_position
+  category: Cameras
+  rest:
+  - UpdateCameraPosition
+  rest_path: PUT /cameras/{cameraId}/position
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_update_camera_position2
+  category: Cameras
+  rest:
+  - UpdateCameraPosition2
+  rest_path: PATCH /cameras/{cameraId}/position
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_protocols
+  category: Cameras
+  rest:
+  - GetProtocols
+  rest_path: GET /cameras/{cameraId}/protocols
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_start_stream
+  category: Cameras
+  rest:
+  - StartStream
+  rest_path: POST /cameras/{cameraId}/streams
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_check_in
+  category: Streams
+  rest:
+  - CheckIn
+  rest_path: POST /streams/{streamId}:checkIn
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_check_out
+  category: Streams
+  rest:
+  - CheckOut
+  rest_path: DELETE /streams/{streamId}
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_locations
+  category: Locations
+  rest:
+  - GetLocations
+  rest_path: GET /locations
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_location
+  category: Locations
+  rest:
+  - GetLocation
+  rest_path: GET /locations/{locationId}
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_location_live_units
+  category: Locations
+  rest:
+  - GetLocationLiveUnits
+  rest_path: GET /locations/{locationId}/liveUnits
+  binding: direct
+  confidence: high
+  note: null
+- tool: lvt_get_alerts_events
+  category: Events
+  rest: []
+  rest_path: GET /alerts/events
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_get_alerts_events_id
+  category: Events
+  rest: []
+  rest_path: GET /alerts/events/{id}
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_post_alerts_events_id_add_note
+  category: Events
+  rest: []
+  rest_path: POST /alerts/events/{id}:addNote
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_post_alerts_events_id_resolve
+  category: Events
+  rest: []
+  rest_path: POST /alerts/events/{id}:resolve
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_post_alerts_events_id_assign_user
+  category: Events
+  rest: []
+  rest_path: POST /alerts/events/{id}:assignUser
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_get_alerts_media_media_id_url
+  category: Media
+  rest: []
+  rest_path: GET /alerts/media/{mediaId}/url
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_post_webhooks
+  category: Webhooks
+  rest: []
+  rest_path: POST /webhooks
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_get_webhooks
+  category: Webhooks
+  rest: []
+  rest_path: GET /webhooks
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_get_webhooks_webhook_id
+  category: Webhooks
+  rest: []
+  rest_path: GET /webhooks/{webhookId}
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_patch_webhooks_webhook_id
+  category: Webhooks
+  rest: []
+  rest_path: PATCH /webhooks/{webhookId}
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_delete_webhooks_webhook_id
+  category: Webhooks
+  rest: []
+  rest_path: DELETE /webhooks/{webhookId}
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_post_webhooks_test
+  category: Webhooks
+  rest: []
+  rest_path: POST /webhooks:test
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+- tool: lvt_get_public_keys_public_key_id
+  category: PublicKeys
+  rest: []
+  rest_path: GET /publicKeys/{publicKeyId}
+  binding: direct
+  confidence: high
+  note: Backing operation has NO operationId in the LVT OpenAPI; bound by method+path instead.
+mcp_only: []
+rest_only: []

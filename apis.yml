@@ -1,23 +1,139 @@
 aid: lvt
 name: LVT
-description: 'LVT is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: 'LVT (LiveView Technologies) is an American physical-security company that builds solar-powered,
+  cellular-connected mobile surveillance units (MSUs) and the SaaS/PaaS platform that runs them — live
+  video, AI analytics, alerting, lights, loudspeakers and AI talk-down — for retail, commercial,
+  industrial, critical-infrastructure and public-sector sites. Founded in 2005 and headquartered in
+  American Fork, Utah, LVT publishes a public Partner API: a REST service over JSON, described by a
+  first-party OpenAPI 3.0.3 document on GitHub, that lets SOC operators and integrators list live units
+  and locations, control cameras (pan/tilt/zoom), start RTSP and WebRTC streams through the LVT camera
+  relay, play sounds, toggle lights, initiate speaker talk-down, review and resolve security alert
+  events, fetch signed media URLs, and register HMAC-signed webhooks. The same API backs LVT''s
+  pre-built integrations with Immix, Axon Fusus and Genetec Security Center, and LVT units also present
+  themselves to third-party VMS platforms as ONVIF cameras.'
 url: https://raw.githubusercontent.com/api-evangelist/lvt/refs/heads/main/apis.yml
+image: https://cdn.prod.website-files.com/674d649ddd92d4cd09236107/6848c7616683823ae0acc47c_a61093f6d3186e071147c4359eed84e2_lvt-open-graph-preview_v1.jpg
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-25'
 modified: '2026-08-25'
 tags:
 - Company
-apis: []
+- Physical Security
+- Video Surveillance
+- Cameras
+- Video Streaming
+- WebRTC
+- RTSP
+- ONVIF
+- IoT
+- Alerts
+- Webhooks
+- Public Safety
+- Retail
+- Critical Infrastructure
+apis:
+- aid: lvt-partner-api
+  name: LVT Partner API
+  description: 'LVT''s Partner API is a REST service using JSON payloads, described by a first-party
+    OpenAPI 3.0.3 document published in the LiveViewTech/lvt-public-api GitHub repository. Version 1.0.1
+    covers 33 operations across Live Units, Cameras, Streams, Locations, Alert Events, Media, Webhooks,
+    Public Keys and Talkdown. Authentication is OAuth 2.0 client credentials against LVT''s Okta-backed
+    authorization server; access is granted through a partnership agreement (email integrations@lvt.com).'
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
+  - Video Surveillance
+  - Cameras
+  - Streaming
+  - Alerts
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-partner-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: DomainSecurity
+  url: security/lvt-domain-security.yml
+- type: OAuthScopes
+  url: scopes/lvt-scopes.yml
+- type: Authentication
+  url: authentication/lvt-authentication.yml
 - type: Website
-  url: https://forgeglobal.com/lvt_stock/
+  url: https://www.lvt.com/
+- type: DeveloperPortal
+  url: https://docs.lvt.com/
+- type: Documentation
+  url: https://docs.lvt.com/r/lvt-partner-api-manual
+- type: APIReference
+  url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+- type: GettingStarted
+  url: https://github.com/LiveViewTech/lvt-public-api
+- type: GitHubOrganization
+  url: https://github.com/LiveViewTech
+- type: Support
+  url: https://www.lvt.com/contact
+- type: Blog
+  url: https://www.lvt.com/blog
+- type: Pricing
+  url: https://www.lvt.com/pricing
+- type: SignUp
+  url: https://vms.liveviewtech.com/
+- type: TermsOfService
+  url: https://www.lvt.com/legal/msa
+- type: PrivacyPolicy
+  url: https://www.lvt.com/legal/privacy
+- type: StatusPage
+  url: https://status.lvt.com/
+- type: TrustCenter
+  url: https://trust.lvt.com/
+- type: LLMsTxt
+  url: llms/lvt-llms.txt
+- type: Packages
+  url: packages/lvt-packages.yml
+- type: MCPServer
+  url: mcp/lvt-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/lvt-tool-crosswalk.yml
+- type: Overlay
+  url: overlays/lvt-partner-api-overlay.yaml
+- type: Conformance
+  url: conformance/lvt-conformance.yml
+- type: Compliance
+  url: conformance/lvt-conformance.yml
+- type: ErrorCatalog
+  url: errors/lvt-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/lvt-lifecycle.yml
+- type: VulnerabilityDisclosure
+  url: security/lvt-vulnerability-disclosure.yml
+- type: Security
+  url: security/lvt-vulnerability-disclosure.yml
+- type: Conventions
+  url: conventions/lvt-conventions.yml
+- type: DataModel
+  url: data-model/lvt-data-model.yml
+- type: Webhooks
+  url: asyncapi/lvt-webhooks.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Plans
+  url: plans/lvt-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/lvt-rate-limits.yml
+x-enrichment:
+  date: '2026-08-25'
+  status: enriched
+  artifacts_added: 25
+  pass: local-v1

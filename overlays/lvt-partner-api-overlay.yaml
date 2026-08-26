@@ -1,0 +1,111 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enrichment overlay for the LVT Partner API
+  version: 1.0.0
+x-provenance:
+  generated: '2026-08-25'
+  method: generated
+  source: openapi/lvt-partner-api-openapi.yml
+  extends: openapi/lvt-partner-api-openapi.yml
+  note: >-
+    This overlay records API Evangelist's enrichment of LVT's published contract. It is NEVER applied to
+    the original — openapi/lvt-partner-api-openapi.yml stays byte-identical to what LVT publishes at
+    https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml. Every action below is
+    grounded in a fact LVT publishes elsewhere (its Partner API manual, its GitHub README, or its own
+    pricing page); no operation, parameter or response is invented.
+extends: https://raw.githubusercontent.com/LiveViewTech/lvt-public-api/master/api-specs/api.yaml
+actions:
+- target: $.info
+  description: Attach contact, licence posture and access model that LVT documents outside the spec.
+  update:
+    contact:
+      name: LVT Integrations
+      email: integrations@lvt.com
+      url: https://docs.lvt.com/r/lvt-partner-api-manual
+    x-support-email: support@lvt.com
+    x-access-model: >-
+      Partnership-gated. Prerequisites are an account with LVT and a partnership agreement; client ID
+      and secret are issued by LVT on request to integrations@lvt.com.
+    x-status-page: https://status.lvt.com/
+    x-manual: https://docs.lvt.com/r/lvt-partner-api-manual
+- target: $.info
+  description: >-
+    Record that the manual header still declares VERSION 1.0.0 while this document declares 1.0.1.
+  update:
+    x-version-discrepancy: >-
+      https://docs.lvt.com/r/lvt-partner-api-manual is headed "VERSION 1.0.0"; info.version here is
+      1.0.1. Observed 2026-08-25.
+- target: $.servers[0]
+  description: Make explicit that LVT itself labels the only server "Production beta version".
+  update:
+    x-stability: production-beta
+- target: $.paths['/cameras/{cameraId}/streams'].post
+  description: >-
+    Surface the stream keep-alive contract that the manual documents but the spec does not state.
+  update:
+    x-lifecycle:
+      keep_alive: 'POST /streams/{streamId}:checkIn on the returned refreshInterval (example 10000 ms)'
+      terminate: 'DELETE /streams/{streamId}'
+      auto_expiry: >-
+        The stream times out on its own if check-in stops. The concrete timeout is longer than
+        refreshInterval but is not published. After expiry or checkout, checkIn and DELETE on that
+        streamId return 404.
+      protocols: 'Query GET /cameras/{cameraId}/protocols first; rtsp and webrtc are documented.'
+      source: https://docs.lvt.com/r/lvt-partner-api-manual
+- target: $.paths['/webhooks'].post
+  description: Surface the delivery, signing and auto-disable rules documented in the manual.
+  update:
+    x-delivery:
+      signature_headers: [X-LVT-HMAC-SHA256, X-LVT-PUBKEY-URL]
+      algorithm: SHA256
+      retry: 'exponential backoff of attempt ^ 2 seconds, up to 10 attempts'
+      auto_disable: 'disabled after 10 failed attempts, with no notification sent'
+      recovery: 'PATCH /webhooks/{webhookId} to re-enable'
+      url_requirement: 'HTTPS only; HTTP explicitly disallowed'
+      validated_on_write: true
+      source: https://docs.lvt.com/r/lvt-partner-api-manual
+- target: $.paths['/webhooks:test'].post
+  description: Record the undocumented-in-spec test helpers, and that this is the API's only dry-run.
+  update:
+    x-dry-run: true
+    x-test-helpers:
+      action: 'query param — makes the test message match a specific action''s documented example'
+      data: 'body field — an unvalidated object that overrides the test message''s data payload'
+      mimeType: 'query param — image/jpeg or video/mp4, only for the mediaAvailable action (defaults to video)'
+    x-semantics: '204 means a subsequent POST /webhooks will succeed; 400 means it will not.'
+    source: https://docs.lvt.com/r/lvt-partner-api-manual
+- target: $.paths['/alerts/media/{mediaId}/url'].get
+  description: Record the signed-URL expiry LVT states in its GitHub README.
+  update:
+    x-signed-url-ttl: 1800
+    x-signed-url-ttl-note: 'The signed media URL expires after 30 minutes.'
+    source: https://github.com/LiveViewTech/lvt-public-api
+- target: $.components.schemas.error
+  description: >-
+    Flag the required/property mismatch in LVT's own error schema so downstream generators do not
+    silently produce an unsatisfiable model.
+  update:
+    x-defect: >-
+      `required` lists `errorCause` (singular) but the defined property is `errorCauses` (plural).
+      Observed in info.version 1.0.1 on 2026-08-25.
+- target: $
+  description: >-
+    Record the enrichment gaps API Evangelist found in the published contract, as a single machine-
+    readable block. These are findings ABOUT the contract, not changes to it.
+  update:
+    x-api-evangelist-findings:
+      operations_without_operationId: 13
+      operations_without_operationId_areas: [Events, Media, Webhooks, PublicKeys]
+      duplicate_semantics_operationId: >-
+        PUT and PATCH on /cameras/{cameraId}/position carry operationIds UpdateCameraPosition and
+        UpdateCameraPosition2 — the "2" suffix leaks a generator artifact into the public contract.
+      no_429_declared: true
+      no_idempotency_mechanism: true
+      no_request_id_header: true
+      no_examples_on_operations: 'Examples appear on schema properties, not as operation-level request/response examples.'
+      onvif_not_in_contract: >-
+        LVT units present to third-party VMS platforms as ONVIF cameras, and the manual documents the
+        per-unit ONVIF port assignment and the RuleEngine/LVT/<eventType> message namespace, but the
+        OpenAPI never mentions ONVIF and no WSDL or device profile is published.
+      no_asyncapi: >-
+        A fully specified 7-action webhook surface exists in prose with no AsyncAPI document to describe it.

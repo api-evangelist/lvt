@@ -1,0 +1,101 @@
+generated: '2026-08-25'
+method: derived
+source: openapi/lvt-partner-api-openapi.yml (components.responses + components.schemas.error) and https://docs.lvt.com/r/lvt-partner-api-manual
+format: vendor-json
+rfc9457: false
+note: 'LVT does NOT use RFC 9457 problem+json. Every error response in the Partner API is application/json
+  carrying the components.schemas.error envelope, which is Okta''s error shape (errorCode "E0000001",
+  errorSummary, errorId, errorCauses[]) — consistent with the API being fronted by an Okta-authenticated
+  Tyk gateway. LVT publishes no numbered error-code registry: errorCode values are not enumerated in the
+  spec or the Partner API manual, so the catalog below is the response-class catalog the contract actually
+  defines. An unauthenticated GET https://api.lvt.com/v1/openapi.json returns this exact envelope live:
+  {"errorCode":"1","errorSummary":"Authorization field missing","errorId":"","errorCauses":["Authorization
+  field missing"]}.'
+envelope:
+  media_type: application/json
+  required:
+  - errorCode
+  - errorSummary
+  - errorId
+  - errorCause
+  fields:
+    errorCode: 'A code associated with this error type (example: E0000001)'
+    errorSummary: A natural-language explanation of the error
+    errorId: An ID identifying this request; maps to the internal server-side error for troubleshooting
+    errorCauses: Array of further detail; empty array when no causes given
+  spec_defect: The `required` list names `errorCause` (singular) but the property defined is `errorCauses`
+    (plural). Recorded as observed; not corrected here.
+problem_type_count: 10
+problem_types:
+- status: 400
+  component: '400'
+  title: Is returned when the request is formatted improperly.
+  media_type: application/json
+  schema: error
+  used_by_operations: 31
+- status: 401
+  component: '401'
+  title: Is returned when the authorization token provided is invalid or expired.
+  media_type: application/json
+  schema: error
+  used_by_operations: 13
+- status: 403
+  component: '403'
+  title: Is returned when the requested resource is not currently accessible with the provided authorization
+    token.
+  media_type: application/json
+  schema: error
+  used_by_operations: 33
+- status: 404
+  component: '404'
+  title: Is returned when the specified resource can not be located.
+  media_type: application/json
+  schema: error
+  used_by_operations: 28
+- status: 406
+  component: '406'
+  title: Is returned when "Accept" header has not been specified or does not contain the value "application/json".
+  media_type: application/json
+  schema: error
+  used_by_operations: 3
+- status: 409
+  component: '409'
+  title: The current state of the server does not allow for the operation.
+  media_type: application/json
+  schema: error
+  used_by_operations: 6
+- status: 422
+  component: '422'
+  title: The operation may not be performed on the specified resource.
+  media_type: application/json
+  schema: error
+  used_by_operations: 1
+- status: 500
+  component: '500'
+  title: Is returned when processing encounters an error.
+  media_type: application/json
+  schema: error
+  used_by_operations: 29
+- status: 503
+  component: '503'
+  title: Is returned when processing is unable to access a needed resource.
+  media_type: application/json
+  schema: error
+  used_by_operations: 2
+- status: null
+  component: defaultError
+  title: Unexpected error.
+  media_type: application/json
+  schema: error
+  used_by_operations: 33
+operation_status_usage:
+  '400': 31
+  '401': 13
+  '403': 33
+  '404': 28
+  '406': 3
+  '409': 6
+  '422': 1
+  '500': 29
+  '503': 2
+  default: 33

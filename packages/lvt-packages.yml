@@ -1,0 +1,43 @@
+generated: '2026-08-25'
+method: searched
+source: >-
+  https://registry.npmjs.org/-/v1/search (queries "liveviewtech", "lvt liveview"), pypi.org/pypi/{lvt,
+  liveviewtech,lvt-api}/json, rubygems.org/api/v1/gems/lvt.json, crates.io/api/v1/crates/lvt,
+  github.com/LiveViewTech (org repo listing), and the LVT Partner API manual at
+  https://docs.lvt.com/r/lvt-partner-api-manual
+package_count: 0
+official_sdk_count: 0
+packages: []
+note: >-
+  LVT publishes NO first-party client SDK for the Partner API in any public package registry. npm,
+  PyPI, RubyGems and crates.io were all searched and returned nothing owned by LiveView Technologies
+  (the npm "liveview*" hits are Phoenix LiveView and unrelated projects). The LiveViewTech GitHub
+  org's only API-facing repository is LiveViewTech/lvt-public-api, which ships the OpenAPI document
+  plus two example READMEs (examples/webhooks, examples/webrtc) containing JavaScript/TypeScript
+  snippets — reference code, not a distributable package: there is no package.json, no tagged release,
+  and no registry entry. The published integration path is therefore "call the REST API directly, or
+  use one of LVT's pre-built VMS integrations (Immix, Axon Fusus, Genetec Security Center)".
+  No `SDKs` pointer is emitted because there is no SDK to point at.
+registries_checked:
+- registry: npm
+  query: liveviewtech
+  result: no first-party package
+- registry: npm
+  query: lvt liveview
+  result: no first-party package
+- registry: pypi
+  packages_probed: [lvt, liveviewtech, lvt-api]
+  result: 404 on all three
+- registry: rubygems
+  packages_probed: [lvt]
+  result: 404
+- registry: crates.io
+  packages_probed: [lvt]
+  result: 403 (crates.io blocks unauthenticated UA); no LVT crate found via search
+- registry: github
+  org: LiveViewTech
+  result: >-
+    30 public repos, overwhelmingly forks of upstream OSS (zephyr, mosquitto, yesod, prometheus-cpp).
+    The only first-party API artifact is lvt-public-api. junto / junto-memory / junto-inbox /
+    junto-stack are first-party but are internal multi-agent LLM coordination tooling, not LVT
+    Partner API clients.

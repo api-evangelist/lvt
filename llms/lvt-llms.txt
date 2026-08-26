@@ -1,0 +1,83 @@
+# LVT (LiveView Technologies) llms.txt
+This file guides Large Language Models to key pages and explicitly allows access for major LLM crawlers.
+
+## Overview
+LVT protects people and property with mobile units, real-time alerts, and Agentic AI. Deter crime, boost awareness, and respond fast, anywhere you need security.
+
+## Key Pages
+
+### Homepage
+[AI-Driven Mobile Security for Every Threat | LVT] https://lvt.com/
+
+### Core Product Pages
+[Product Overview – Explore LVT's cutting‑edge security products] https://www.lvt.com/product
+[High‑Performance Security Hardware – Built For Your Evolving Security Needs] https://www.lvt.com/product/security-hardware
+[Security Platform Integrations – Security Integrations for Efficient Operations] https://www.lvt.com/product/platform-integrations
+[Cutting‑Edge Security Software – intelligent security software] https://www.lvt.com/product/surveillance-software
+[Outdoor Security Cameras – Outdoor Security Cameras Built to Last] https://www.lvt.com/hardware/outdoor-security-cameras
+[AI-Powered Security & Surveillance | LVT] https://www.lvt.com/product/agentic-ai
+
+### Solution Pages
+[Comprehensive Security Solutions – Protect property, people, and assets with scalable security systems designed to prevent a wide range of threats] https://www.lvt.com/security-solutions
+[What are LVT's Security Solutions? – LVT, or LiveView Technologies, is the premier provider of mobile surveillance technology] https://www.lvt.com/who-is-lvt/security-solutions
+
+### About LVT
+[About LVT Security Solutions – Headquartered in Utah since 2005, LiveView Technologies has provided on‑demand, rapidly deployed surveillance] https://www.lvt.com/about
+[Who is LVT? – LiveView Technologies (LVT) is a leading provider of advanced mobile surveillance units and security solutions] https://www.lvt.com/who-is-lvt
+
+### Contact LVT
+[Contact Us - LVT Mobile Security Solutions] https://www.lvt.com/contact
+
+### Software
+[Cutting‑Edge Security Software – intelligent security software] https://www.lvt.com/product/surveillance-software
+[LVT Platform — See the VMS and Command Center – Introduction to LVT’s remote video management platform] https://www.lvt.com/resources/lvt-platform-see-the-vms-and-command-center
+[Security Analytics powered by AI – Security video analytics for smarter surveillance] https://www.lvt.com/features/security-data-analytics
+[LiveView Technologies Relaunches Video Management System – Details on new SaaS/PaaS software enhancements] https://www.lvt.com/press/liveview-technologies-relaunches-video-management-system-applications-for-security-surveillance
+[Why Security Cameras Need Software – Key software features to look for in VMS] https://www.lvt.com/blog/why-security-cameras-need-software 
+
+### Industry Pages
+[Smart Security for Retail Businesses – Protect your retail business with AI‑driven loss prevention and customer safety] https://www.lvt.com/retail-security
+[Commercial Video Surveillance – Smart security for offices, buildings, and construction sites] https://www.lvt.com/commercial-security
+[Industrial Video Surveillance – Mobile security units for factories, cargo, utilities, and remote industrial environments] https://www.lvt.com/industrials-security
+[Public Sector Video Surveillance – Mobile video systems for government, public safety, and community protection] https://www.lvt.com/public-sector-security
+[Law Enforcement Surveillance Equipment – Mobile surveillance systems to support public safety and crime prevention] https://www.lvt.com/industries/law-enforcement-security
+[End‑to‑End Manufacturing Security – Mobile units for industrial theft prevention, intrusion detection, and employee safety] https://www.lvt.com/industries/manufacturing-security 
+[Big Box Retail Security Challenges – Outdoor surveillance for parking lots, theft deterrence, and loss prevention] https://www.lvt.com/industries/big-box-security
+[State & Local Government Facility Security – Monitoring perimeters, ballot boxes, and public buildings] https://www.lvt.com/industries/state-local-gov-security 
+[Transportation Security Solutions – Protect logistics workers, cargo, and critical transit infrastructure] https://www.lvt.com/industries/transportation-security
+[Energy & Utilities Security – AI‑powered perimeter protection for substations, dams, refineries, and remote sites] https://www.lvt.com/industries/energy-utility-security
+[Freight & Logistics Security – Layered mobile surveillance to prevent cargo theft and tampering] https://www.lvt.com/industries/freight-logistics-security
+[Military‑Grade Security Technology – Rapid‑deploy, rugged units for border, base, and recon operations] https://www.lvt.com/industries/military-security
+[Critical Infrastructure Security – Solutions for grid, hydro, and remote critical asset protection] https://www.lvt.com/industries/critical-infrastructure-security
+
+## Sitemap
+Sitemap: https://www.lvt.com/sitemap.xml
+
+## AI Crawler Access
+This section ensures consistent access for all crawlers including Google
+
+Major LLM crawlers - always allowed for consistency
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: GeminiBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Default allow for all other crawlers
+User-agent: *
+Allow: /

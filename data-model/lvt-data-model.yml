@@ -1,0 +1,478 @@
+generated: '2026-08-25'
+method: derived
+source: openapi/lvt-partner-api-openapi.yml (components.schemas $ref graph + *Id reference fields)
+note: 'Entity-relationship graph derived mechanically from the LVT Partner API OpenAPI 3.0.3 document.
+  LVT publishes no object reference page and no id-prefix scheme — every identifier in the contract is
+  a bare RFC 4122 UUID (format: uuid), so an id carries no type information and an agent cannot tell a
+  cameraId from a liveUnitId by inspection. The domain core is: a client owns locations, a location hosts
+  liveUnits, a liveUnit hosts cameras plus lights and sounds, cameras produce streams, and liveUnits raise
+  alerts which group into alertEvents carrying media, notes, an assigned user and a resolution.'
+root_entities:
+- liveUnit
+- camera
+- location
+- alertEvent
+- alert
+- webhook
+- light
+- sound
+identifier_scheme:
+  format: uuid
+  prefixes: none
+  note: No typed or prefixed ids (contrast Stripe cus_/ch_). All ids are opaque UUIDs.
+entity_count: 47
+relationship_count: 27
+entities:
+- name: address
+  field_count: 6
+  fields:
+  - city
+  - county
+  - country
+  - state
+  - street
+  - zip
+  id_field: null
+- name: camera
+  field_count: 12
+  fields:
+  - id
+  - liveUnitId
+  - placement
+  - serialNumber
+  - manufacturer
+  - model
+  - mountPosition
+  - name
+  - thermal
+  - viewType
+  - streamSlot
+  - capabilities
+  id_field: id
+- name: cameras
+  field_count: 0
+  fields: []
+  id_field: null
+- name: placement
+  field_count: 2
+  fields:
+  - position
+  - mountUnit
+  id_field: null
+- name: mountUnit
+  field_count: 3
+  fields:
+  - id
+  - type
+  - gpsLocation
+  id_field: id
+- name: cameraPosition
+  field_count: 4
+  fields:
+  - pan
+  - tilt
+  - zoom
+  - focus
+  id_field: null
+- name: cameraPositionPut
+  field_count: 4
+  fields:
+  - pan
+  - tilt
+  - zoom
+  - focus
+  id_field: null
+- name: liveUnit
+  field_count: 5
+  fields:
+  - id
+  - clientId
+  - gpsLocation
+  - locationId
+  - name
+  id_field: id
+- name: liveUnits
+  field_count: 0
+  fields: []
+  id_field: null
+- name: gpsCoordinates
+  field_count: 2
+  fields:
+  - latitude
+  - longitude
+  id_field: null
+- name: location
+  field_count: 4
+  fields:
+  - id
+  - gpsLocation
+  - name
+  - address
+  id_field: id
+- name: locations
+  field_count: 0
+  fields: []
+  id_field: null
+- name: streamProtocol
+  field_count: 1
+  fields:
+  - protocol
+  id_field: null
+- name: streamProtocols
+  field_count: 0
+  fields: []
+  id_field: null
+- name: streamDataPoly
+  field_count: 0
+  fields: []
+  id_field: null
+- name: streamDataRtsp
+  field_count: 4
+  fields:
+  - protocol
+  - refreshInterval
+  - streamingUrl
+  - streamId
+  id_field: null
+- name: streamDataWebrtc
+  field_count: 5
+  fields:
+  - protocol
+  - refreshInterval
+  - signalUrl
+  - streamId
+  - streamInfo
+  id_field: null
+- name: error
+  field_count: 4
+  fields:
+  - errorCode
+  - errorSummary
+  - errorId
+  - errorCauses
+  id_field: null
+- name: paginated
+  field_count: 3
+  fields:
+  - itemsCount
+  - nextCursorUri
+  - totalResults
+  id_field: null
+- name: cameraMountPosition
+  field_count: 0
+  fields: []
+  id_field: null
+- name: alertEvent
+  field_count: 10
+  fields:
+  - id
+  - eventTime
+  - alerts
+  - assignedUser
+  - client
+  - location
+  - liveUnit
+  - notes
+  - resolution
+  - priority
+  id_field: id
+- name: alertClient
+  field_count: 2
+  fields:
+  - id
+  - name
+  id_field: id
+- name: alertLiveUnit
+  field_count: 2
+  fields:
+  - id
+  - name
+  id_field: id
+- name: alertLocation
+  field_count: 5
+  fields:
+  - id
+  - name
+  - timezone
+  - latitude
+  - longitude
+  id_field: id
+- name: alert
+  field_count: 6
+  fields:
+  - id
+  - eventId
+  - alertTime
+  - media
+  - alertType
+  - camera
+  id_field: id
+- name: alertCamera
+  field_count: 4
+  fields:
+  - id
+  - mountPosition
+  - thermal
+  - viewType
+  id_field: id
+- name: alertTypeSummary
+  field_count: 2
+  fields:
+  - id
+  - name
+  id_field: id
+- name: alertType
+  field_count: 7
+  fields:
+  - id
+  - name
+  - description
+  - archived
+  - parentAlert
+  - readOnly
+  - defaultPriority
+  id_field: id
+- name: alertNote
+  field_count: 5
+  fields:
+  - id
+  - message
+  - user
+  - createdTime
+  - updatedTime
+  id_field: id
+- name: alertUser
+  field_count: 2
+  fields:
+  - id
+  - name
+  id_field: id
+- name: alertNotes
+  field_count: 0
+  fields: []
+  id_field: null
+- name: alertTypes
+  field_count: 0
+  fields: []
+  id_field: null
+- name: alertEvents
+  field_count: 0
+  fields: []
+  id_field: null
+- name: alertEventActiveQuery
+  field_count: 0
+  fields: []
+  id_field: null
+- name: alertResolution
+  field_count: 4
+  fields:
+  - id
+  - name
+  - resolvedTime
+  - user
+  id_field: id
+- name: alertMedia
+  field_count: 4
+  fields:
+  - id
+  - mimeType
+  - timestamp
+  - camera
+  id_field: id
+- name: alertPriority
+  field_count: 0
+  fields: []
+  id_field: null
+- name: callInfo
+  field_count: 3
+  fields:
+  - phoneNumber
+  - extension
+  - passcode
+  id_field: null
+- name: pem
+  field_count: 0
+  fields: []
+  id_field: null
+- name: webhook
+  field_count: 5
+  fields:
+  - id
+  - url
+  - namespace
+  - enabled
+  - created
+  id_field: id
+- name: webhooks
+  field_count: 0
+  fields: []
+  id_field: null
+- name: sound
+  field_count: 2
+  fields:
+  - id
+  - name
+  id_field: id
+- name: sounds
+  field_count: 0
+  fields: []
+  id_field: null
+- name: lightState
+  field_count: 0
+  fields: []
+  id_field: null
+- name: light
+  field_count: 4
+  fields:
+  - id
+  - type
+  - state
+  - name
+  id_field: id
+- name: lights
+  field_count: 0
+  fields: []
+  id_field: null
+- name: talkDownData
+  field_count: 2
+  fields:
+  - wssUrl
+  - callId
+  id_field: null
+relationships:
+- from: camera
+  field: placement
+  to: placement
+  kind: has_one
+  via: $ref
+- from: camera
+  field: mountPosition
+  to: cameraMountPosition
+  kind: has_one
+  via: $ref
+- from: placement
+  field: position
+  to: cameraMountPosition
+  kind: has_one
+  via: $ref
+- from: placement
+  field: mountUnit
+  to: mountUnit
+  kind: has_one
+  via: $ref
+- from: mountUnit
+  field: gpsLocation
+  to: gpsCoordinates
+  kind: has_one
+  via: $ref
+- from: liveUnit
+  field: gpsLocation
+  to: gpsCoordinates
+  kind: has_one
+  via: $ref
+- from: location
+  field: gpsLocation
+  to: gpsCoordinates
+  kind: has_one
+  via: $ref
+- from: location
+  field: address
+  to: address
+  kind: has_one
+  via: $ref
+- from: alertEvent
+  field: alerts
+  to: alert
+  kind: has_many
+  via: $ref
+- from: alertEvent
+  field: assignedUser
+  to: alertUser
+  kind: has_one
+  via: $ref
+- from: alertEvent
+  field: client
+  to: alertClient
+  kind: has_one
+  via: $ref
+- from: alertEvent
+  field: location
+  to: alertLocation
+  kind: has_one
+  via: $ref
+- from: alertEvent
+  field: liveUnit
+  to: alertLiveUnit
+  kind: has_one
+  via: $ref
+- from: alertEvent
+  field: notes
+  to: alertNotes
+  kind: has_one
+  via: $ref
+- from: alertEvent
+  field: resolution
+  to: alertResolution
+  kind: has_one
+  via: $ref
+- from: alertEvent
+  field: priority
+  to: alertPriority
+  kind: has_one
+  via: $ref
+- from: alert
+  field: media
+  to: alertMedia
+  kind: has_many
+  via: $ref
+- from: alert
+  field: alertType
+  to: alertTypeSummary
+  kind: has_one
+  via: $ref
+- from: alert
+  field: camera
+  to: alertCamera
+  kind: has_one
+  via: $ref
+- from: alertType
+  field: parentAlert
+  to: alertTypeSummary
+  kind: has_one
+  via: $ref
+- from: alertNote
+  field: user
+  to: alertUser
+  kind: has_one
+  via: $ref
+- from: alertResolution
+  field: user
+  to: alertUser
+  kind: has_one
+  via: $ref
+- from: alertMedia
+  field: camera
+  to: alertCamera
+  kind: has_one
+  via: $ref
+- from: light
+  field: state
+  to: lightState
+  kind: has_one
+  via: $ref
+- from: camera
+  field: liveUnitId
+  to: liveUnit
+  kind: belongs_to
+  via: id-reference
+- from: liveUnit
+  field: locationId
+  to: location
+  kind: belongs_to
+  via: id-reference
+- from: error
+  field: errorId
+  to: error
+  kind: belongs_to
+  via: id-reference
+render: null

@@ -1,0 +1,122 @@
+generated: '2026-08-25'
+method: searched
+source: >-
+  openapi/lvt-partner-api-openapi.yml, https://docs.lvt.com/r/lvt-partner-api-manual,
+  https://github.com/LiveViewTech/lvt-public-api, https://www.lvt.com/pricing,
+  https://www.lvt.com/legal/security, https://www.lvt.com/legal/vdp,
+  https://lvt-auth.okta.com/.well-known/openid-configuration
+standards:
+- id: oauth2
+  conforms: true
+  evidence: >-
+    openapi/lvt-partner-api-openapi.yml components.securitySchemes.OAuth2 declares
+    type: oauth2 with a clientCredentials flow, tokenUrl https://api.lvt.com/oauth2/v1/token and three
+    scopes. The manual and GitHub README both document the RFC 6749 client-credentials exchange
+    (Basic base64(client_id:client_secret) -> {token_type: Bearer, expires_in: 3600, access_token}).
+- id: oidc
+  conforms: partial
+  evidence: >-
+    https://lvt-auth.okta.com/.well-known/openid-configuration returns HTTP 200 with a complete OIDC
+    discovery document (issuer, authorization/token/userinfo endpoints, jwks_uri, RS256). That tenant
+    backs the LVT VMS/console sign-in, not the Partner API. The Partner API itself is client-credentials
+    only and publishes no OIDC discovery under an lvt.com host — every /.well-known/openid-configuration
+    probe on www.lvt.com and api.lvt.com returned 404.
+- id: rfc9457
+  conforms: false
+  evidence: >-
+    No application/problem+json anywhere. Every 4xx/5xx uses components.schemas.error, an Okta-shaped
+    envelope {errorCode, errorSummary, errorId, errorCauses[]}. See errors/lvt-problem-types.yml.
+- id: pagination
+  conforms: true
+  evidence: >-
+    Cursor pagination via `limit` (1-100) and an opaque `cursor` query parameter, with responses
+    carrying itemsCount / nextCursorUri / totalResults (components.schemas.paginated). Applied to
+    GetLiveUnits, GetLiveUnitCameras, GetLocations and GetLocationLiveUnits.
+- id: idempotency
+  conforms: false
+  evidence: >-
+    No Idempotency-Key header, no client-supplied request key, no safe-retry statement in the OpenAPI,
+    the manual, or the GitHub README. Notable because several writes actuate physical hardware. See
+    conventions/lvt-conventions.yml.
+- id: rate-limit-headers
+  conforms: false
+  evidence: >-
+    No 429 response on any of the 33 operations and no RateLimit-*/X-RateLimit-*/Retry-After header
+    documented, despite the manual stating the API is metered and floods can be blocked.
+- id: json:api
+  conforms: false
+  evidence: Plain JSON resources; no JSON:API document structure, media type, or links object.
+- id: scim
+  conforms: false
+  evidence: No SCIM schema URN or /Users//Groups surface. User objects appear only as alertUser inside alert events.
+- id: odata
+  conforms: false
+  evidence: No $metadata endpoint, no OData query options.
+- id: aip-136-custom-methods
+  conforms: true
+  evidence: >-
+    8 of 33 operations use Google AIP-136 colon custom methods (:call, :play, :toggle, :checkIn,
+    :addNote, :resolve, :assignUser, :test), and the manual explicitly documents the colon as a URL
+    delimiter that must terminate the request URL.
+- id: rfc2119
+  conforms: true
+  evidence: >-
+    The Partner API manual formally adopts BCP 14 / RFC 2119 / RFC 8174 keyword semantics in its
+    opening section — an unusually rigorous move for a vendor integration manual.
+domain_standards:
+- id: onvif
+  market: physical security / IP video surveillance (VMS integration)
+  conforms: true
+  declared_in: documentation
+  evidence: >-
+    The Partner API manual's Genetec integration topic states that basic ONVIF camera connectivity is
+    established using a unique IP:port per LVT unit and that "To the integrating software, the device is
+    simply an ONVIF camera", assigns a dedicated ONVIF port per unit in the 49152-65535 range, names an
+    `onvif.api.lvt.com` host and dedicated ONVIF proxy IPs (13.248.168.72/32, 35.71.162.205/32), and
+    specifies that Genetec alerts are driven by `RuleEngine/LVT/<eventType>` ONVIF messages streamed into
+    Security Desk. Source: https://docs.lvt.com/r/lvt-partner-api-manual
+  caveat: >-
+    IMPORTANT — this is declared in LVT's technical integration documentation, NOT in the machine-readable
+    contract. The OpenAPI document says nothing about ONVIF, and LVT publishes no ONVIF WSDL or device
+    profile (a ?wsdl probe against api.lvt.com returned the gateway's 400 "Authorization field missing").
+    A buyer who already speaks ONVIF can integrate LVT units as cameras without a bespoke connector, but
+    they must read prose to learn that.
+- id: rtsp
+  market: video streaming
+  conforms: true
+  declared_in: contract
+  evidence: >-
+    components.schemas.streamProtocol / streamDataRtsp in the OpenAPI, and
+    POST /cameras/{cameraId}/streams with {"protocol":"rtsp"} returning an rtsp:// streamingUrl.
+    GET /cameras/{cameraId}/protocols advertises which protocols a given camera supports.
+- id: webrtc
+  market: video streaming
+  conforms: true
+  declared_in: contract
+  evidence: >-
+    components.schemas.streamDataWebrtc in the OpenAPI; the manual documents the full WebRTC
+    offer/answer negotiation against the LVT camera relay signal server, including RTCPeerConnection
+    SDP exchange and the 502/504/200 readiness codes.
+- id: hmac-sha256-webhook-signing
+  market: event delivery
+  conforms: true
+  declared_in: documentation
+  evidence: >-
+    X-LVT-HMAC-SHA256 / X-LVT-PUBKEY-URL headers, SHA256 over the stringified body, public key served
+    as application/x-pem-file from GET /publicKeys/{publicKeyId}. See asyncapi/lvt-webhooks.yml.
+compliance:
+- program: SOC 2 Type II
+  claimed: true
+  source: 'https://www.lvt.com/pricing — "All plans include LVT''s SOC 2 Type II certified platform and industry-leading uptime."'
+  report_available: unverified
+  note: >-
+    LVT operates a Trust Center at https://trust.lvt.com/ which is linked from the site footer, but it
+    sits behind a Cloudflare interstitial that returned HTTP 403 to both an ordinary crawler and a
+    browser-UA fetch, so the certification list could not be read and no further certifications are
+    asserted here. See security/lvt-trust-center.yml.
+- program: Vulnerability Disclosure Policy
+  claimed: true
+  source: https://www.lvt.com/legal/vdp
+  note: >-
+    Private invite-only bug bounty hosted on Bugcrowd, with a published safe-harbour commitment.
+    See security/lvt-vulnerability-disclosure.yml.

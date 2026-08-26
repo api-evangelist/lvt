@@ -1,0 +1,2388 @@
+openapi: 3.0.3
+info:
+  title: LVT API
+  description: Public REST API
+  version: 1.0.1
+servers:
+  - url: 'https://api.lvt.com/v1'
+    description: Production beta version
+security:
+  - OAuth2: [ ]
+tags:
+  - name: Cameras
+    description: Operations on cameras
+  - name: LiveUnits
+    description: Operations on LiveUnits
+  - name: Locations
+    description: Operations on locations
+  - name: Webhooks
+    description: Operations on webhooks
+  - name: PublicKeys
+    description: Operations related to outbound message verification
+  - name: Talkdown
+    description: Operations related to Partner Talkdown
+
+paths:
+  /liveUnits:
+    get:
+      operationId: GetLiveUnits
+      security:
+        - OAuth2: [ account.liveUnits.manage ]
+      tags:
+        - LiveUnits
+      summary: This endpoint returns all the live units accessible by the specified client.
+      description: >
+        **Phase 1**:
+        List of liveUnits for the user's client
+      parameters:
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of liveUnits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/liveUnits'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /liveUnits/{liveUnitId}:
+    parameters:
+      - name: liveUnitId
+        in: path
+        description: Specified live unit.
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetLiveUnit
+      security:
+        - OAuth2: [ account.liveUnits.manage ]
+      tags:
+        - LiveUnits
+      summary: Details for the specified live unit.
+      description: >
+        **Phase 1**:
+        Details for the specified live unit.
+      responses:
+        '200':
+          description: A live unit instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/liveUnit'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /liveUnits/{liveUnitId}/callInfo:
+    parameters:
+      - name: liveUnitId
+        in: path
+        description: Specified live unit.
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetLiveUnitCallInfo
+      tags:
+        - LiveUnits
+      summary: Get information on how to make a call to the live unit
+      description: >
+        **Phase 2**: 
+        Get information on how to make a call to the live unit
+      responses:
+        '200':
+          description: Call information for a live unit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/callInfo'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /liveUnits/{liveUnitId}/cameras:
+    get:
+      operationId: GetLiveUnitCameras
+      security:
+        - OAuth2: [ account.cameras.manage ]
+      tags:
+        - LiveUnits
+      summary: List of user accessible cameras hosted by the given liveUnit.
+      parameters:
+        - name: liveUnitId
+          in: path
+          description: Filter results by liveUnitId.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of cameras.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cameras'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /liveUnits/{liveUnitId}/sounds:
+    get:
+      operationId: GetLiveUnitSounds
+      tags:
+        - LiveUnits
+      summary: List of quick sounds that can be played by the live unit
+      description: >
+        **Phase 3**:
+        List of quick sounds that can be played by the live unit
+      parameters:
+        - name: liveUnitId
+          in: path
+          description: Filter results by liveUnitId.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of sounds.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sounds'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /liveUnits/{liveUnitId}:call:
+    post:
+      operationId: TalkDownStart
+      tags:
+        - LiveUnits
+        - Talkdown
+      summary: Initiate a speaker talk-down call
+      description: >
+        Initiate a speaker talk-down call with the live unit.
+      parameters:
+        - name: liveUnitId
+          in: path
+          description: Filter results by liveUnitId.
+          required: true
+          schema:
+            type: string
+        - name: securityAlertId
+          in: query
+          description: ID of an alert that prompted the talkdown action
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An object containing a WebSocket URL for initiating a talkdown session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/talkDownData'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /liveUnits/{liveUnitId}/sounds/{soundId}:play:
+    post:
+      operationId: PlayLiveUnitSound
+      tags:
+        - LiveUnits
+      summary: Play a quick sound from a live unit
+      description: >
+        **Phase 3**:
+        Play a quick sound from a live unit
+      parameters:
+        - name: liveUnitId
+          in: path
+          description: Filter results by liveUnitId.
+          required: true
+          schema:
+            type: string
+        - name: soundId
+          in: path
+          description: The sound ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/409'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /liveUnits/{liveUnitId}/lights:
+    get:
+      operationId: GetLiveUnitLights
+      tags:
+        - LiveUnits
+      summary: List of lights on the live unit
+      description: >
+        **Phase 3**:
+        List of lights on the live unit
+      parameters:
+        - name: liveUnitId
+          in: path
+          description: Filter results by liveUnitId.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of lights.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lights'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /liveUnits/{liveUnitId}/lights/{lightId}:toggle:
+    post:
+      operationId: ToggleLiveUnitLight
+      tags:
+        - LiveUnits
+      summary: Toggle the status of a light on a live unit
+      description: >
+        **Phase 3**:
+        Toggle the status of a light on a live unit
+      parameters:
+        - name: liveUnitId
+          in: path
+          description: Filter results by liveUnitId.
+          required: true
+          schema:
+            type: string
+        - name: lightId
+          in: path
+          description: The light ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/updateLiveUnitLight'
+      responses:
+        '200':
+          description: toggle response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - resetTime
+                  - state
+                properties:
+                  resetTime:
+                    type: number
+                    description: Milliseconds until the light will revert to its previous state. If 0, it will remain indefinitely.
+                    example: 60000
+                  state:
+                    $ref: '#/components/schemas/lightState'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/409'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /cameras/{cameraId}:
+    parameters:
+      - name: cameraId
+        in: path
+        description: Identifier of the camera to operate on.
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetLiveUnitCamera
+      security:
+        - OAuth2: [ account.cameras.manage ]
+      tags:
+        - Cameras
+      summary: Details of selected camera.
+      description: >
+        **Phase 1**:
+        Details of selected camera.
+      responses:
+        '200':
+          description: A camera instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/camera'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /cameras/{cameraId}/position:
+    parameters:
+      - name: cameraId
+        in: path
+        description: Camera to operate on.
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetCameraPosition
+      security:
+        - OAuth2: [ account.cameras.manage ]
+      tags:
+        - Cameras
+      summary: Returns the selected camera's PTZF values
+      description: >
+        **Phase 1**:
+        Returns the selected camera's PTZF values
+      responses:
+        '200':
+          description: >
+            Current position of the specified camera.
+
+
+            Some camera models do not support focus, these cameras will return null for the focus.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cameraPosition'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '503':
+          $ref: '#/components/responses/503'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+    put:
+      operationId: UpdateCameraPosition
+      deprecated: true
+      security:
+        - OAuth2: [ account.cameras.manage ]
+      tags:
+        - Cameras
+      summary: Updates the selected camera's PTZF values
+      description: >
+        **This endpoint is deprecated. Use the PATCH request.**
+
+
+        Updates a camera's PTZF
+      requestBody:
+        description: Updates the absolute position of a camera
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cameraPositionPut'
+      responses:
+        '200':
+          description: A camera instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cameraPositionPut'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+    patch:
+      operationId: UpdateCameraPosition2
+      security:
+        - OAuth2: [ account.cameras.manage ]
+      tags:
+        - Cameras
+      summary: Updates the selected camera's PTZF values
+      description: >
+        Sets a camera's position relative to its current position unless the absolute query parameter is passed.
+
+
+        Some camera models do not support focus. If the focus is sent, it will be ignored.
+      parameters:
+        - in: path
+          name: cameraId
+          description: Camera to operate on.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: absolute
+          description: Set camera's position with absolute positioning rather than relative.
+          schema:
+            type: boolean
+          example: true
+      requestBody:
+        description: >
+          Updates the position of a camera.
+           
+          If the query parameter `absolute=true`, any negative ptzf values are
+          treated as inverses. For example, `{pan: -1} === {pan: 359}`
+           
+          While the range of `pan/tilt` is expressed from `-360` to `360`, this
+          doesn't necessarily mean the camera has a full 360° of motion.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cameraPosition'
+      responses:
+        '202':
+          description: Successful. Sending to camera async.
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '422':
+          $ref: '#/components/responses/422'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /cameras/{cameraId}/protocols:
+    get:
+      operationId: GetProtocols
+      security:
+        - OAuth2: [ account.cameras.manage ]
+      tags:
+        - Cameras
+      summary: Returns list of protocols supported
+      description: >
+        **Phase 1**:
+        Get list of protocols supported by this camera.
+      parameters:
+        - in: path
+          name: cameraId
+          description: Camera to operate on.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of protocols supported by the camera.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/streamProtocols'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /cameras/{cameraId}/streams:
+    post:
+      operationId: StartStream
+      security:
+        - OAuth2: [ account.cameras.manage ]
+      tags:
+        - Cameras
+        - Streams
+      summary: Start a stream
+      description: >
+        **Phase 1**:
+        Starts a stream and returns stream data for the camera
+      parameters:
+        - in: path
+          name: cameraId
+          description: Camera to operate on.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/startStream'
+      responses:
+        '200':
+          description: stream data for the camera.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/streamDataPoly'
+              examples:
+                rtsp:
+                  value:
+                    protocol: 'rtsp'
+                    streamId: '96129d6f-7143-45d7-a8ea-3081a11fc4b5'
+                    refreshInterval: 10000
+                    streamingUrl: string
+                webrtc:
+                  value:
+                    protocol: 'webrtc'
+                    streamId: '96129d6f-7143-45d7-a8ea-3081a11fc4b5'
+                    refreshInterval: 10000
+                    signalUrl: wss://primary.camerarelay.com/websocket-session.json
+                    streamInfo: {}
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/409'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /streams/{streamId}:checkIn:
+    post:
+      operationId: CheckIn
+      security:
+        - OAuth2: [ account.cameras.manage ]
+      tags:
+        - Streams
+      summary: Check in streaming for the camera
+      description: >
+        **Phase 1**:
+        Check in streaming for the camera
+      parameters:
+        - in: path
+          name: streamId
+          description: The specific stream record id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/409'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /streams/{streamId}:
+    delete:
+      operationId: CheckOut
+      security:
+        - OAuth2: [ account.cameras.manage ]
+      tags:
+        - Streams
+      summary: Check out streaming for the camera
+      description: >
+        **Phase 1**:
+        Check out streaming for the camera
+      parameters:
+        - in: path
+          name: streamId
+          description: The specific stream record id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /locations:
+    get:
+      operationId: GetLocations
+      security:
+        - OAuth2: [ account.locations.manage ]
+      tags:
+        - Locations
+      summary: List of locations for the user's client
+      description: >
+        **Phase 1**: 
+        Returns all the locations accessible by the specified client.
+      parameters:
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of locations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/locations'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /locations/{locationId}:
+    parameters:
+      - name: locationId
+        in: path
+        description: Specified location.
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: GetLocation
+      security:
+        - OAuth2: [ account.locations.manage ]
+      tags:
+        - Locations
+      summary: Details for the specified location.
+      description: >
+        **Phase 1**:
+        Details for the specified location.
+      responses:
+        '200':
+          description: A location instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/location'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /locations/{locationId}/liveUnits:
+    get:
+      operationId: GetLocationLiveUnits
+      security:
+        - OAuth2: [ account.liveUnits.manage ]
+      tags:
+        - Locations
+      summary: List of user accessible live units at the given location.
+      description: >
+        **Phase 1**:
+        List of user accessible live units at the given location.
+      parameters:
+        - name: locationId
+          in: path
+          description: Filter results by locationId.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of live units.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/liveUnits'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /alerts/events:
+    get:
+      summary: Get events
+      description: Get a list of events. By default it returns all owned events, but can be filtered using the query parameters.
+      tags: [Events]
+      parameters:
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/cursor'
+        - name: archived
+          in: query
+          description: Filter by archived status
+          schema:
+            $ref: '#/components/schemas/alertEventActiveQuery'
+        - name: beginTime
+          in: query
+          description: ISO 8601 formatted string. Filter events which have a time equal or greater
+          schema:
+            type: string
+            format: date-time
+            example: 2023-01-01T12:00:00.000Z
+        - name: endTime
+          in: query
+          description: ISO 8601 formatted string. Filter events which have a time equal or less
+          schema:
+            type: string
+            format: date-time
+            example: 2023-01-01T12:00:00.000Z
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/alertEvents'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /alerts/events/{id}:
+    get:
+      summary: Get an event
+      description: Get an event with the provided ID.
+      tags: [Events]
+      parameters:
+        - $ref: '#/components/parameters/alertEventId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/alertEvent'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /alerts/events/{id}:addNote:
+    post:
+      summary: Create a Note
+      description: Create a new Note for the event with the provided ID.
+      tags: [Events]
+      parameters:
+        - $ref: '#/components/parameters/alertEventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - message
+              properties:
+                userId:
+                  type: string
+                  description: The UUID of the specific user that added the note.
+                message:
+                  type: string
+      responses:
+        200:
+          $ref: '#/components/responses/createdObject'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /alerts/events/{id}:resolve:
+    post:
+      summary: Resolve an event
+      description: Resolve an event with the provided ID.
+      tags: [Events]
+      parameters:
+        - $ref: '#/components/parameters/alertEventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - resolutionId
+                - resolutionTime
+              properties:
+                resolutionId:
+                  type: string
+                  format: uuid
+                resolutionTime:
+                  type: string
+                  format: date-time
+                  example: 2023-01-01T12:00:00.000Z
+
+      responses:
+        200:
+          $ref: '#/components/responses/updatedObject'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /alerts/events/{id}:assignUser:
+    post:
+      summary: Assign a user to an event
+      description: Assign a user to an event with the provided ID.
+      tags: [Events]
+      parameters:
+        - $ref: '#/components/parameters/alertEventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  nullable: true
+                  description: The UUID of the specific user to assign. Null to unassign a user.
+
+      responses:
+        200:
+          $ref: '#/components/responses/updatedObject'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /alerts/media/{mediaId}/url:
+    get:
+      summary: Get a signed url for media
+      description: Get a signed url for the provided ID.
+      tags: [Media]
+      parameters:
+        - name: mediaId
+          in: path
+          required: true
+          description: The UUID of the specific media to sign.
+          schema:
+            type: string
+            format: uuid
+          example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    example: https://cdn.lvt.com/static/images/image.jpg
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /webhooks:
+    post:
+      summary: Create a Webhook
+      description: |-
+        Create a Webhook.
+        
+        Upon creation, a webhook is first verified by sending a test message. The message must be responded to with a 2xx response code to be considered successful. This success is 
+        prerequisite to the Webhook creation. This process can be tested using the `/webhooks:test` endpoint before committing to creating a Webhook.
+      tags: [ Webhooks ]
+      requestBody:
+        $ref: '#/components/requestBodies/createWebhook'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+    get:
+      summary: Get Webhooks
+      description: Get a list of Webhooks. By default it returns all owned Webhooks, but can be filtered using the query parameters.
+      tags: [ Webhooks ]
+      parameters:
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/cursor'
+        - name: enabled
+          in: query
+          description: Filter results to return Webhooks where enabled equals the provided state. If omitted it returns all results.
+          schema:
+            type: boolean
+          example: true
+        - name: namespace
+          in: query
+          description: Comma delimited list of namespaces that should be included in the response.
+          schema:
+            type: string
+          example: alerts,other
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhooks'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /webhooks/{webhookId}:
+    get:
+      summary: Get a Webhook
+      description: Get a Webhook with the provided ID.
+      tags: [ Webhooks ]
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          description: The UUID of the specific webhook to fetch.
+          schema:
+            type: string
+            format: uuid
+          example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+    patch:
+      summary: Update a Webhook
+      description: Update specific properties of a Webhook. If the property is not listed as acceptable in the request body and needs to be changed, you can delete the existing Webhook and recreate it instead.
+      tags: [ Webhooks ]
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          description: The UUID of the specific webhook to fetch.
+          schema:
+            type: string
+            format: uuid
+          example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+      requestBody:
+        $ref: '#/components/requestBodies/updateWebhook'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+    delete:
+      summary: Delete a Webhook
+      tags: [ Webhooks ]
+      parameters:
+        - name: webhookId
+          in: path
+          required: true
+          description: The UUID of the specific webhook to fetch.
+          schema:
+            type: string
+            format: uuid
+          example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+      responses:
+        204:
+          description: Deleted
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /webhooks:test:
+    post:
+      summary: Test a Webhook
+      description: |-
+        Send a test message to a specified URL.
+        
+        This message contains the following payload with a signature in the `X-LVT-HMAC-SHA256` header so developers can test the validation process used in Webhook creation.
+        ```json
+        {
+          "attempt": 1,
+          "currentAttemptTimestamp": "<CURRENT_DATE_AS_ISO_8601_STRING>",
+          "action": "test",
+          "data": {
+            "message": "Hello, world!"
+          }
+        }
+        ```
+      tags: [ Webhooks ]
+      requestBody:
+        $ref: '#/components/requestBodies/updateWebhook'
+      responses:
+        204:
+          description: OK
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+  /publicKeys/{publicKeyId}:
+    get:
+      summary: Get a Public Key
+      description: Get a Public Key with the provided ID.
+      tags: [ PublicKeys ]
+      parameters:
+        - name: publicKeyId
+          in: path
+          required: true
+          description: The UUID of the specific public key to fetch.
+          schema:
+            type: string
+            format: uuid
+          example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+      responses:
+        200:
+          description: OK
+          content:
+            application/x-pem-file:
+              schema:
+                $ref: '#/components/schemas/pem'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+
+###############################################################################
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.lvt.com/oauth2/v1/token
+          scopes:
+            account.liveUnits.manage: Edit a live units data
+            account.cameras.manage: Edit a cameras data
+            account.locations.manage: Edit a locations data
+  responses:
+    '400':
+      description: 'Is returned when the request is formatted improperly.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    '401':
+      description: 'Is returned when the authorization token provided is invalid or expired.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    '403':
+      description: 'Is returned when the requested resource is not currently accessible with the provided authorization token.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    '404':
+      description: 'Is returned when the specified resource can not be located.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    '406':
+      description: 'Is returned when "Accept" header has not been specified or does not contain the value "application/json".'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    '409':
+      description: 'The current state of the server does not allow for the operation.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    '422':
+      description: 'The operation may not be performed on the specified resource.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    '500':
+      description: 'Is returned when processing encounters an error.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    '503':
+      description: 'Is returned when processing is unable to access a needed resource.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+
+    createdObject:
+      description: The object was created successfully.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: The UUID of the created object
+
+    updatedObject:
+      description: The object was updated successfully.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: The UUID of the updated object
+
+  parameters:
+    count:
+      name: limit
+      in: query
+      description: Limit reply list page size.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
+
+    alertEventId:
+      name: id
+      in: path
+      required: true
+      description: The UUID of the specific event to fetch.
+      schema:
+        type: string
+        format: uuid
+      example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+
+  requestBodies:
+    createWebhook:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: HTTPS URL of the resource to receive Webhook messages.
+                example: https://www.example.com/webhooks
+              namespace:
+                type: string
+                description: The namespace for the event types to receive.
+                example: alerts
+              enabled:
+                type: boolean
+                description: Whether the Webhook is actively receiving messages.
+                example: true
+
+    updateWebhook:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: HTTPS URL of the resource to receive Webhook messages.
+                example: https://www.example.com/webhooks
+              namespace:
+                type: string
+                description: The namespace for the event types to receive.
+                example: alerts
+              enabled:
+                type: boolean
+                description: Whether the Webhook is actively receiving messages.
+                example: true
+
+    testWebhook:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: HTTPS URL of the resource to receive Webhook messages.
+                example: https://www.example.com/webhooks
+              namespace:
+                type: string
+                description: The namespace for the event types to receive.
+                example: alerts
+
+
+    startStream:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - protocol
+            properties:
+              protocol:
+                type: string
+                enum:
+                  - webrtc
+                  - rtsp
+
+    updateLiveUnitLight:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - state
+            properties:
+              state:
+                $ref: '#/components/schemas/lightState'
+
+  schemas:
+    address:
+      type: object
+      required:
+        - city
+        - county
+        - country
+        - state
+        - street
+        - zip
+      properties:
+        city:
+          type: string
+          example: American Fork
+          nullable: true
+        county:
+          type: string
+          example: Utah
+          nullable: true
+        country:
+          type: string
+          example: USA
+          nullable: true
+        state:
+          type: string
+          example: Utah
+          nullable: true
+        street:
+          type: string
+          example: 802 E 1050 S
+          nullable: true
+        zip:
+          type: string
+          example: 84003
+          nullable: true
+
+    camera:
+      type: object
+      required:
+        - id
+        - liveUnitId
+        - placement 
+        - mountPosition
+        - thermal
+        - name
+        - viewType
+        - streamSlot
+        - capabilities
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of the camera
+        liveUnitId:
+          type: string
+          format: uuid
+          description: The live unit hosting this camera
+        placement:
+          $ref: '#/components/schemas/placement'
+        serialNumber:
+          type: string
+          description: Serial number of the camera
+          example: LVT0000001
+          deprecated: true
+        manufacturer:
+          type: string
+          description: Manufacturer of the camera
+          example: Axis
+          deprecated: true
+        model:
+          type: string
+          description: Model of the camera
+          example: Q6135-LE
+          deprecated: true
+        mountPosition:
+          $ref: '#/components/schemas/cameraMountPosition'
+        name:
+          type: string
+          description: Name of the camera
+          example: Primary
+        thermal:
+          type: boolean
+          description: If the camera streams thermal video
+        viewType:
+          type: string
+          description: View type of the camera
+          enum:
+            - single
+            - panoramic
+            - quadView
+            - multi 
+        streamSlot:
+          type: integer
+          description: The slot of the stream on any given camera. For all single stream cameras, this will be 1. Multi-Sensor Panoramic cameras have 4 stream slots.
+          minimum: 1
+          maximum: 4
+        capabilities:
+          type: object
+          description: Capabilities which the camera supports
+          required:
+            - position
+          properties:
+            position:
+              type: boolean
+              description: If the camera supports positional ptzf commands
+
+    cameras:
+      allOf:
+        - $ref: '#/components/schemas/paginated'
+        - type: object
+          required:
+            - cameras
+          properties:
+            items:
+              type: array
+              maxItems: 20
+              items:
+                $ref: '#/components/schemas/camera'
+
+    placement:
+      type: object
+      required:
+        - position
+        - mountUnit
+      description: Describes form and position of camera mount 
+      properties:
+        position:
+          $ref: '#/components/schemas/cameraMountPosition'
+        mountUnit:
+          $ref: '#/components/schemas/mountUnit'
+
+    mountUnit:
+      type: object
+      required:
+        - id
+        - type
+        - gpsLocation
+      description: Describes form of camera mount
+      properties:
+        id:
+          type: string
+          description: The id of the mount unit
+        type:
+          type: string
+          description: Type of mount the camera is on
+          enum:
+            - liveUnit
+            - liveUnitSurroundHead
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
+
+    cameraPosition:
+      type: object
+      properties:
+        pan:
+          description: Pan value.
+          type: number
+          format: float
+          minimum: -360
+          maximum: 360
+        tilt:
+          description: Tilt value.
+          type: number
+          format: float
+          minimum: -360
+          maximum: 360
+        zoom:
+          description: Zoom value.
+          type: number
+          format: float
+          minimum: -100
+          maximum: 100
+        focus:
+          description: Focus value.
+          type: number
+          nullable: true
+          format: float
+          minimum: -100
+          maximum: 100 
+
+    cameraPositionPut:
+      type: object
+      required:
+        - pan
+        - tilt
+        - zoom
+        - focus
+      properties:
+        pan:
+          description: Absolute pan value
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 10000
+        tilt:
+          description: Absolute tilt value.
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 10000
+        zoom:
+          description: Absolute zoom value.
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 10000
+        focus:
+          description: Absolute focus value.  A value of -1 enables auto-focus.
+          type: integer
+          format: int32
+          minimum: -1
+          maximum: 10000
+
+    liveUnit:
+      type: object
+      required:
+        - id
+        - clientId
+        - gpsLocation
+        - locationId
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the live unit
+        clientId:
+          type: string
+          format: uuid
+          description: The id of the client that owns the live unit
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
+        locationId:
+          type: string
+          format: uuid
+          description: The id of the location this live unit is associated with
+        name:
+          type: string
+          description: User assigned name for the live unit
+
+    liveUnits:
+      allOf:
+        - $ref: '#/components/schemas/paginated'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              maxItems: 20
+              items:
+                $ref: '#/components/schemas/liveUnit'
+
+    gpsCoordinates:
+      type: object
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          type: number
+          format: float
+          minimum: -90.00
+          maximum: 90.00
+          description: GPS Decimal Degrees Latitude
+          example: 40.123456
+        longitude:
+          type: number
+          format: float
+          minimum: -180.00
+          maximum: 180.00
+          description: GPS Decimal Degrees Longitude
+          example: -111.789
+
+    location:
+      type: object
+      required:
+        - id
+        - gpsLocation
+        - name
+        - address
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: UUID of location
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
+        name:
+          type: string
+          description: 'User defined name of a location'
+          example: 'Store #326 North Parking Lot'
+        address:
+          $ref: '#/components/schemas/address'
+
+    locations:
+      allOf:
+        - $ref: '#/components/schemas/paginated'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              maxItems: 20
+              items:
+                $ref: '#/components/schemas/location'
+
+    streamProtocol:
+      type: object
+      required:
+        - protocol
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: 'webrtc'
+          enum:
+            - 'webrtc'
+            - 'rtsp'
+
+    streamProtocols:
+      allOf:
+        - $ref: '#/components/schemas/paginated'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/streamProtocol'
+    streamDataPoly:
+      oneOf:
+        - $ref: '#/components/schemas/streamDataRtsp'
+        - $ref: '#/components/schemas/streamDataWebrtc'
+      discriminator:
+        propertyName: protocol
+        mapping:
+          rtsp: '#/components/schemas/streamDataRtsp'
+          webrtc: '#/components/schemas/streamDataWebrtc'
+
+    streamDataRtsp:
+      type: object
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: 'rtsp'
+        refreshInterval:
+          type: integer
+          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
+          format: int32
+        streamingUrl:
+          type: string
+          description: rtsp url to access the stream
+          format: uri
+        streamId:
+          type: string
+          description: Identifier for the current stream
+          format: uuid
+
+    streamDataWebrtc:
+      type: object
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: 'webrtc'
+        refreshInterval:
+          type: integer
+          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
+          format: int32
+        signalUrl:
+          type: string
+          description: web socket url to the signal server
+          format: uri
+        streamId:
+          description: Identifier for the current stream
+          type: string
+          format: uuid
+        streamInfo:
+          description: Data that is passed to to the signal server
+          type: object
+          additionalProperties: true
+
+    error:
+      type: object
+      required:
+        - errorCode
+        - errorSummary
+        - errorId
+        - errorCause
+      properties:
+        errorCode:
+          type: string
+          description: A code that is associated with this error type
+          example: E0000001
+        errorSummary:
+          type: string
+          description: A natural language explanation of the error
+          example: Api validation failed
+        errorId:
+          type: string
+          description: >
+            An ID that identifies this request. 
+            These IDs are mapped to the internal error on the server side to assist in troubleshooting.
+          example: oaeHfmOAx1iRLa0H10DeMz5fQ
+        errorCauses:
+          type: array
+          description: Further information about what caused this error. Should be empty array if no causes given.
+          items:
+            type: string
+            example: 'login: An object with this field already exists in the current organization'
+
+    paginated:
+      type: object
+      required: # items should also be defined but is omitted from the schema to keep it generic
+        - itemsPerPage
+        - nextCursorUri
+        - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type: string
+          nullable: true
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
+
+
+    cameraMountPosition:
+      type: string
+      description: The position of the camera on the live unit
+      enum:
+        - center
+        - left
+        - right
+        - unassigned
+      example: center
+
+    alertEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the event
+        eventTime:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the first alert was triggered
+          example: 2023-01-01T12:00:00.000Z
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/alert'
+        assignedUser:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/alertUser'
+        client:
+          $ref: '#/components/schemas/alertClient'
+        location:
+          $ref: '#/components/schemas/alertLocation'
+        liveUnit:
+          $ref: '#/components/schemas/alertLiveUnit'
+        notes:
+          $ref: '#/components/schemas/alertNotes'
+        resolution:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/alertResolution'
+        priority:
+          $ref: '#/components/schemas/alertPriority'
+
+    alertClient:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the client for which the alert was raised
+        name:
+          type: string
+          description: The Name of the client at time of event
+          maxLength: 255
+    alertLiveUnit:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the Live Unit
+        name:
+          type: string
+          description: The Name of the Live Unit at time of the event
+          maxLength: 255
+    alertLocation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the event Location
+        name:
+          type: string
+          description: The Name of the event Location at time of the event
+          maxLength: 255
+        timezone:
+          type: string
+          description: The timezone of the location that raised the alert at time of event
+          example: 'America/Denver'
+        latitude:
+          type: number
+          format: float
+          minimum: -90.00
+          maximum: 90.00
+          description: GPS Decimal Degrees Latitude of the location at time of event
+          example: 40.123456
+        longitude:
+          type: number
+          format: float
+          minimum: -180.00
+          maximum: 180.00
+          description: GPS Decimal Degrees Longitude of the location at time of event
+          example: -111.789
+    alert:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the alert
+        eventId:
+          type: string
+          format: uuid
+          description: The UUID of the event
+        alertTime:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the alert was triggered
+          example: 2023-01-01T12:00:00.000Z
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/alertMedia'
+        alertType:
+          $ref: '#/components/schemas/alertTypeSummary'
+        camera:
+          $ref: '#/components/schemas/alertCamera'
+
+    alertCamera:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the camera on the live unit.
+        mountPosition:
+          type: string
+          description: The position of the camera on the live unit.
+        thermal:
+          type: boolean
+          description: Whether the camera is a thermal camera.
+          example: false
+        viewType:
+          type: string
+          description: The type of view the camera has.
+          example: 'panoramic'
+
+    alertTypeSummary:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the alert type
+        name:
+          type: string
+          description: The Name of the alert type
+          maxLength: 255
+          example: 'Animal Detection'
+    alertType:
+      type: object
+      required:
+        - name
+        - description
+        - readOnly
+        - defaultPriority
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the alert type
+        name:
+          type: string
+          description: The Name of the alert type
+          maxLength: 255
+        description:
+          type: string
+          description: The Description of the alert type
+          maxLength: 255
+        archived:
+          type: boolean
+          description: Whether the alert type is archived
+          example: false
+          default: false
+        parentAlert:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/alertTypeSummary'
+        readOnly:
+          type: boolean
+          description: Whether the alert type is read only
+          example: false
+        defaultPriority:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 10
+          description: Default priority used when scoring a new alert event
+          example: 5
+    alertNote:
+      type: object
+      required:
+        - id
+        - message
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the note
+        message:
+          type: string
+          description: The note
+          maxLength: 255
+          example: 'This is a note'
+        user:
+          $ref: '#/components/schemas/alertUser'
+        createdTime:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the note was created
+          example: 2023-01-01T12:00:00.000Z
+        updatedTime:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the note was updated
+          example: 2023-01-01T12:00:00.000Z
+    alertUser:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the user
+        name:
+          type: string
+          description: The name of the user
+          example: greg thomas
+    alertNotes:
+      type: array
+      items:
+        $ref: '#/components/schemas/alertNote'
+
+    alertTypes:
+      allOf:
+        - $ref: '#/components/schemas/paginated'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              maxItems: 100
+              items:
+                $ref: '#/components/schemas/alertType'
+
+    alertEvents:
+      allOf:
+        - $ref: '#/components/schemas/paginated'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              maxItems: 100
+              items:
+                $ref: '#/components/schemas/alertEvent'
+    alertEventActiveQuery:
+      type: string
+      enum:
+        - all
+        - historical
+        - active
+      example: all
+      default: active
+    alertResolution:
+      type: object
+      required:
+        - id
+        - name
+        - resolvedTime
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the resolution
+        name:
+          type: string
+          description: short name for the resolution type
+        resolvedTime:
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the event was resolved
+          example: 2023-01-01T12:00:00.000Z
+        user:
+          nullable: true
+          description: User who resolved the event. Null if it was auto-resolved by LVT system
+          $ref: '#/components/schemas/alertUser'
+
+    alertMedia:
+      type: object
+      required:
+        - id
+        - mimeType
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the media
+        mimeType:
+          type: string
+          description: The mime type of the media
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the media was added
+          example: 2023-01-01T12:00:00.000Z
+        camera:
+          $ref: '#/components/schemas/alertCamera'
+
+    alertPriority:
+      type: string
+      description: Current evaluated priority as of the time the entity was queried. Note that this can vary over time.
+      enum:
+        - high
+        - medium
+        - low
+      example: medium
+
+    callInfo:
+      type: object
+      description: Information required to call a live unit
+      required:
+        - phoneNumber
+        - extension
+        - passcode
+      properties:
+        phoneNumber:
+          type: string
+          format: phone
+          description: The phone number to call in with
+          example: +1 (111) 111-1111
+        extension:
+          type: string
+          description: The extension to dial after calling in
+          example: 1234
+        passcode:
+          type: string
+          description: The passcode to enter when prompted
+          example: 1234
+
+    pem:
+      type: string
+
+    webhook:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the Webhook.
+        url:
+          type: string
+          format: uri
+          description: HTTPS URL of the resource to receive webhook messages.
+          example: https://api.example.com/receiveWebhook
+        namespace:
+          type: string
+          description: The namespace for the event types to receive.
+          example: securityAlerts
+        enabled:
+          type: boolean
+          description: Whether the Webhooks is actively receiving messages.
+          example: true
+        created:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the webhook was created.
+          example: 2023-01-01T12:00:00.000Z
+    webhooks:
+      allOf:
+        - $ref: '#/components/schemas/paginated'
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              maxItems: 100
+              items:
+                $ref: '#/components/schemas/webhook'
+
+    sound:
+      type: object
+      description: The information about a quick sound a live unit can play.
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the sound.
+        name:
+          type: string
+          description: The human readable name of the sound.
+          example: Trespassing
+
+    sounds:
+      allOf:
+        - $ref: '#/components/schemas/paginated'
+        - type: object
+          required: [ items ]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/sound'
+
+    lightState:
+      type: string
+      enum:
+        - 'on'
+        - 'off'
+        - 'unavailable'
+
+    light:
+      type: object
+      description: A light on a live unit.
+      required:
+        - id # Does this use an id?
+        - type
+        - state
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the light.
+        type:
+          type: string
+          description: The type of light
+          enum:
+            - strobe
+            - flood
+            - camera
+        state:
+          $ref: '#/components/schemas/lightState'
+        name:
+          type: string
+          description: Optional name to describe the light beyond the type
+
+    lights:
+      allOf:
+        - $ref: '#/components/schemas/paginated'
+        - type: object
+          required: [ items ]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/light'
+
+    talkDownData:
+      type: object
+      description: Data required to initiate a talkdown session
+      required:
+        - wssUrl
+        - callId
+      properties:
+        wssUrl:
+          type: string
+          format: uri
+          description: >
+            The WebSocket url. Send audio as byte arrays of mono,
+            Mulaw-encoded audio packets with a sample rate of 8KHz.
+            Close the socket to end the talkdown session.
+          example: wss://talkdown.api.lvt.com?callId=456
+        callId:
+          type: string
+          description: A unique identifier for the talkdown session

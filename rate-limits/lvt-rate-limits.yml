@@ -1,0 +1,35 @@
+generated: '2026-08-25'
+method: searched
+source: >-
+  https://docs.lvt.com/r/lvt-partner-api-manual (WEBHOOKS FOR THE PARTNER API topic),
+  https://github.com/LiveViewTech/lvt-public-api, openapi/lvt-partner-api-openapi.yml
+limit_count: 0
+rate_limits: []
+response_headers: []
+status_on_exhaustion: null
+note: >-
+  LVT publishes NO numeric rate limits for the Partner API. All 33 operations in the OpenAPI were
+  checked: not one declares a 429 response, and components.responses contains no 429 at all. No
+  X-RateLimit-*, RateLimit-* or Retry-After header is documented anywhere. The only statement on the
+  subject is prose in the webhooks topic of the Partner API manual: "Use of LVT's Partner API is
+  metered, and LVT can block clients who spam or flood the service. The result for when you call
+  /publicKeys should be cached and reused." That tells an integrator a limit exists and that exceeding
+  it can get them blocked, but gives no window, no quota, and no runtime signal — an agent cannot tell
+  how close it is, and cannot learn from the response that it has been throttled. Recorded as an honest
+  zero.
+related_throttles:
+  - surface: webhook delivery (LVT -> your endpoint, not you -> LVT)
+    behaviour: >-
+      Exponential backoff of `attempt ^ 2` seconds between delivery retries; after 10 failed attempts
+      (any non-2xx) the webhook endpoint is automatically DISABLED with no notification. Re-enable with
+      PATCH /webhooks/{webhookId}.
+    source: https://docs.lvt.com/r/lvt-partner-api-manual
+  - surface: stream check-in (a keep-alive cadence, not a limit)
+    behaviour: >-
+      StartStream returns a server-chosen `refreshInterval` in milliseconds (example 10000) which is the
+      recommended interval to call POST /streams/{streamId}:checkIn. Missing one or two check-ins does
+      not immediately drop the stream; the real timeout is longer and is not published.
+    source: https://docs.lvt.com/r/lvt-partner-api-manual
+  - surface: signed media URLs
+    behaviour: 'A signed URL returned by GET /alerts/media/{mediaId}/url expires after 30 minutes.'
+    source: https://github.com/LiveViewTech/lvt-public-api

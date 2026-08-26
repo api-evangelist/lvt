@@ -1,0 +1,99 @@
+generated: '2026-08-25'
+method: probed
+source: live HTTP probes of every LVT host in apis.yml + OpenAPI servers[]
+note: >-
+  Every RFC/registry well-known path 404s on the two hosts that answer honestly (www.lvt.com and the
+  api.lvt.com Tyk/Envoy gateway). docs.lvt.com (a Fluid Topics tenant) and app.lvt.com (the VMS single-
+  page app) return HTTP 200 with text/html for EVERY /.well-known/* path, including paths that cannot
+  exist — those are SPA catch-alls, not documents, and are recorded as misses. No WellKnown or
+  SecurityTxt pointer is emitted, because LVT serves no well-known document. NOTE that LVT DOES publish
+  OAuth metadata, just not under its own domain: its Okta tenant answers
+  https://lvt-auth.okta.com/.well-known/openid-configuration with a real OIDC discovery document (that
+  tenant serves the VMS/console login; the Partner API's client-credentials token endpoint is
+  https://api.lvt.com/oauth2/v1/token, which is an Okta-fronted path that returns 405 on GET).
+hosts:
+- host: www.lvt.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: api.lvt.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: docs.lvt.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    note: HTML SPA shell (Fluid Topics catch-all) — not a document; counted as a miss
+  - path: /.well-known/openid-configuration
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/api-catalog
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/agent-card.json
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/agent.json
+    status: 200
+    note: HTML SPA shell — counted as a miss
+- host: app.lvt.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    note: HTML SPA shell (VMS app catch-all) — not a document; counted as a miss
+  - path: /.well-known/openid-configuration
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/api-catalog
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/agent-card.json
+    status: 200
+    note: HTML SPA shell — counted as a miss
+  - path: /.well-known/agent.json
+    status: 200
+    note: HTML SPA shell — counted as a miss
+- host: lvt-auth.okta.com
+  documents:
+  - path: /.well-known/openid-configuration
+    status: 200
+    note: >-
+      Real OIDC discovery document, but served by LVT's Okta tenant (okta.com), not by an LVT-controlled
+      hostname. Recorded for completeness; not counted as an LVT-served well-known document.
