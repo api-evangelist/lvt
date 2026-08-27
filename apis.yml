@@ -34,24 +34,144 @@ tags:
 - Retail
 - Critical Infrastructure
 apis:
-- aid: lvt-partner-api
-  name: LVT Partner API
-  description: 'LVT''s Partner API is a REST service using JSON payloads, described by a first-party
-    OpenAPI 3.0.3 document published in the LiveViewTech/lvt-public-api GitHub repository. Version 1.0.1
-    covers 33 operations across Live Units, Cameras, Streams, Locations, Alert Events, Media, Webhooks,
-    Public Keys and Talkdown. Authentication is OAuth 2.0 client credentials against LVT''s Okta-backed
-    authorization server; access is granted through a partnership agreement (email integrations@lvt.com).'
+- aid: lvt:lvt-cameras-api
+  name: LVT Cameras API
+  description: Operations on cameras
   humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
   baseURL: https://api.lvt.com/v1
   tags:
-  - Video Surveillance
   - Cameras
-  - Streaming
-  - Alerts
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-cameras-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
+- aid: lvt:lvt-events-api
+  name: LVT Events API
+  description: The Events API from LVT — 5 operation(s) for events.
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-events-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
+- aid: lvt:lvt-liveunits-api
+  name: LVT Live Units API
+  description: Operations on LiveUnits
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
+  - LiveUnits
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-liveunits-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
+- aid: lvt:lvt-locations-api
+  name: LVT Locations API
+  description: Operations on locations
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
+  - Locations
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-locations-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
+- aid: lvt:lvt-media-api
+  name: LVT Media API
+  description: The Media API from LVT — 1 operation(s) for media.
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
+  - Media
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-media-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
+- aid: lvt:lvt-publickeys-api
+  name: LVT Public Keys API
+  description: Operations related to outbound message verification
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
+  - PublicKeys
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-publickeys-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
+- aid: lvt:lvt-streams-api
+  name: LVT Streams API
+  description: The Streams API from LVT — 3 operation(s) for streams.
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
+  - Streams
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-streams-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
+- aid: lvt:lvt-talkdown-api
+  name: LVT Talkdown API
+  description: Operations related to Partner Talkdown
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
+  - Talkdown
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-talkdown-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
+- aid: lvt:lvt-webhooks-api
+  name: LVT Webhooks API
+  description: Operations on webhooks
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
   - Webhooks
   properties:
   - type: OpenAPI
-    url: openapi/lvt-partner-api-openapi.yml
+    url: openapi/lvt-webhooks-api-openapi.yml
   - type: Documentation
     url: https://docs.lvt.com/r/lvt-partner-api-manual
   - type: APIReference
