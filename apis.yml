@@ -12,6 +12,18 @@ description: 'LVT (LiveView Technologies) is an American physical-security compa
   pre-built integrations with Immix, Axon Fusus and Genetec Security Center, and LVT units also present
   themselves to third-party VMS platforms as ONVIF cameras.'
 url: https://raw.githubusercontent.com/api-evangelist/lvt/refs/heads/main/apis.yml
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://cdn.prod.website-files.com/674d649ddd92d4cd09236107/6848c7616683823ae0acc47c_a61093f6d3186e071147c4359eed84e2_lvt-open-graph-preview_v1.jpg
 x-type: company
 x-source: harvest:secondary-market
