@@ -1,0 +1,27 @@
+slug: lvt
+provider: LVT
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Telecommunications
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 1
+edges:
+- tag: Webhooks
+  spec_file: lvt-webhooks-api-openapi.yml
+  capability_id: BC-4270.80
+  capability_id_l1: BC-4270
+  capability_name: Webhook & Event Subscription Management
+  confidence: 0.7
+  evidence: POST /webhooks Create a Webhook; PATCH /webhooks/{webhookId} Update a Webhook; POST /webhooks:test
+    Test a Webhook
+  reason: The operations are full lifecycle CRUD plus delivery testing of outbound webhook subscriptions
+    exposed on the vendor's public REST API, which is precisely Webhook & Event Subscription Management.
+    Confidence held below 0.8 because webhook plumbing is often better treated as non-business integration
+    machinery.
