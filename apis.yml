@@ -34,6 +34,21 @@ tags:
 - Company
 - Physical Security
 - Video Surveillance
+- Camera
+- Video Streaming
+- WebRTC
+- RTSP
+- ONVIF
+- IoT
+- Alerts
+- Webhook
+- Public Safety
+- Retail
+- Critical Infrastructure
+tags_raw:
+- Company
+- Physical Security
+- Video Surveillance
 - Cameras
 - Video Streaming
 - WebRTC
@@ -52,6 +67,8 @@ apis:
   humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
   baseURL: https://api.lvt.com/v1
   tags:
+  - Camera
+  tags_raw:
   - Cameras
   properties:
   - type: OpenAPI
@@ -68,6 +85,8 @@ apis:
   humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
   baseURL: https://api.lvt.com/v1
   tags:
+  - Event
+  tags_raw:
   - Events
   properties:
   - type: OpenAPI
@@ -180,6 +199,8 @@ apis:
   humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
   baseURL: https://api.lvt.com/v1
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI
