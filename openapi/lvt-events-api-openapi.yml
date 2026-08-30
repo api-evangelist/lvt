@@ -1,0 +1,602 @@
+openapi: 3.2.0
+info:
+  title: LVT Events API
+  description: Public REST API
+  version: 1.0.1
+servers:
+- url: https://api.lvt.com/v1
+  description: Production beta version
+security:
+- OAuth2: []
+tags:
+- name: Events
+paths:
+  /alerts/events:
+    get:
+      summary: Get events
+      description: Get a list of events. By default it returns all owned events, but can be filtered using the query parameters.
+      tags:
+      - Events
+      parameters:
+      - $ref: '#/components/parameters/count'
+      - $ref: '#/components/parameters/cursor'
+      - name: archived
+        in: query
+        description: Filter by archived status
+        schema:
+          $ref: '#/components/schemas/alertEventActiveQuery'
+      - name: beginTime
+        in: query
+        description: ISO 8601 formatted string. Filter events which have a time equal or greater
+        schema:
+          type: string
+          format: date-time
+          example: 2023-01-01 12:00:00+00:00
+      - name: endTime
+        in: query
+        description: ISO 8601 formatted string. Filter events which have a time equal or less
+        schema:
+          type: string
+          format: date-time
+          example: 2023-01-01 12:00:00+00:00
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/alertEvents'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /alerts/events/{id}:
+    get:
+      summary: Get an event
+      description: Get an event with the provided ID.
+      tags:
+      - Events
+      parameters:
+      - $ref: '#/components/parameters/alertEventId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/alertEvent'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /alerts/events/{id}:addNote:
+    post:
+      summary: Create a Note
+      description: Create a new Note for the event with the provided ID.
+      tags:
+      - Events
+      parameters:
+      - $ref: '#/components/parameters/alertEventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - userId
+              - message
+              properties:
+                userId:
+                  type: string
+                  description: The UUID of the specific user that added the note.
+                message:
+                  type: string
+      responses:
+        200:
+          $ref: '#/components/responses/createdObject'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /alerts/events/{id}:resolve:
+    post:
+      summary: Resolve an event
+      description: Resolve an event with the provided ID.
+      tags:
+      - Events
+      parameters:
+      - $ref: '#/components/parameters/alertEventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - resolutionId
+              - resolutionTime
+              properties:
+                resolutionId:
+                  type: string
+                  format: uuid
+                resolutionTime:
+                  type: string
+                  format: date-time
+                  example: 2023-01-01 12:00:00+00:00
+      responses:
+        200:
+          $ref: '#/components/responses/updatedObject'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /alerts/events/{id}:assignUser:
+    post:
+      summary: Assign a user to an event
+      description: Assign a user to an event with the provided ID.
+      tags:
+      - Events
+      parameters:
+      - $ref: '#/components/parameters/alertEventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type:
+                  - string
+                  - 'null'
+                  description: The UUID of the specific user to assign. Null to unassign a user.
+      responses:
+        200:
+          $ref: '#/components/responses/updatedObject'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+components:
+  parameters:
+    alertEventId:
+      name: id
+      in: path
+      required: true
+      description: The UUID of the specific event to fetch.
+      schema:
+        type: string
+        format: uuid
+      example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+    count:
+      name: limit
+      in: query
+      description: Limit reply list page size.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
+  schemas:
+    alertCamera:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the camera on the live unit.
+        mountPosition:
+          type: string
+          description: The position of the camera on the live unit.
+        thermal:
+          type: boolean
+          description: Whether the camera is a thermal camera.
+          example: false
+        viewType:
+          type: string
+          description: The type of view the camera has.
+          example: panoramic
+    alertEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the event
+        eventTime:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the first alert was triggered
+          example: 2023-01-01 12:00:00+00:00
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/alert'
+        assignedUser:
+          allOf:
+          - $ref: '#/components/schemas/alertUser'
+        client:
+          $ref: '#/components/schemas/alertClient'
+        location:
+          $ref: '#/components/schemas/alertLocation'
+        liveUnit:
+          $ref: '#/components/schemas/alertLiveUnit'
+        notes:
+          $ref: '#/components/schemas/alertNotes'
+        resolution:
+          allOf:
+          - $ref: '#/components/schemas/alertResolution'
+        priority:
+          $ref: '#/components/schemas/alertPriority'
+    alert:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the alert
+        eventId:
+          type: string
+          format: uuid
+          description: The UUID of the event
+        alertTime:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the alert was triggered
+          example: 2023-01-01 12:00:00+00:00
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/alertMedia'
+        alertType:
+          $ref: '#/components/schemas/alertTypeSummary'
+        camera:
+          $ref: '#/components/schemas/alertCamera'
+    error:
+      type: object
+      required:
+      - errorCode
+      - errorSummary
+      - errorId
+      - errorCause
+      properties:
+        errorCode:
+          type: string
+          description: A code that is associated with this error type
+          example: E0000001
+        errorSummary:
+          type: string
+          description: A natural language explanation of the error
+          example: Api validation failed
+        errorId:
+          type: string
+          description: 'An ID that identifies this request.  These IDs are mapped to the internal error on the server side to assist in troubleshooting.
+
+            '
+          example: oaeHfmOAx1iRLa0H10DeMz5fQ
+        errorCauses:
+          type: array
+          description: Further information about what caused this error. Should be empty array if no causes given.
+          items:
+            type: string
+            example: 'login: An object with this field already exists in the current organization'
+    alertNotes:
+      type: array
+      items:
+        $ref: '#/components/schemas/alertNote'
+    alertEvents:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            maxItems: 100
+            items:
+              $ref: '#/components/schemas/alertEvent'
+    alertClient:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the client for which the alert was raised
+        name:
+          type: string
+          description: The Name of the client at time of event
+          maxLength: 255
+    alertPriority:
+      type: string
+      description: Current evaluated priority as of the time the entity was queried. Note that this can vary over time.
+      enum:
+      - high
+      - medium
+      - low
+      example: medium
+    alertLocation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the event Location
+        name:
+          type: string
+          description: The Name of the event Location at time of the event
+          maxLength: 255
+        timezone:
+          type: string
+          description: The timezone of the location that raised the alert at time of event
+          example: America/Denver
+        latitude:
+          type: number
+          format: float
+          minimum: -90.0
+          maximum: 90.0
+          description: GPS Decimal Degrees Latitude of the location at time of event
+          example: 40.123456
+        longitude:
+          type: number
+          format: float
+          minimum: -180.0
+          maximum: 180.0
+          description: GPS Decimal Degrees Longitude of the location at time of event
+          example: -111.789
+    alertLiveUnit:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the Live Unit
+        name:
+          type: string
+          description: The Name of the Live Unit at time of the event
+          maxLength: 255
+    alertNote:
+      type: object
+      required:
+      - id
+      - message
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the note
+        message:
+          type: string
+          description: The note
+          maxLength: 255
+          example: This is a note
+        user:
+          $ref: '#/components/schemas/alertUser'
+        createdTime:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the note was created
+          example: 2023-01-01 12:00:00+00:00
+        updatedTime:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the note was updated
+          example: 2023-01-01 12:00:00+00:00
+    alertTypeSummary:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the alert type
+        name:
+          type: string
+          description: The Name of the alert type
+          maxLength: 255
+          example: Animal Detection
+    alertUser:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the user
+        name:
+          type: string
+          description: The name of the user
+          example: greg thomas
+    alertResolution:
+      type: object
+      required:
+      - id
+      - name
+      - resolvedTime
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the resolution
+        name:
+          type: string
+          description: short name for the resolution type
+        resolvedTime:
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the event was resolved
+          example: 2023-01-01 12:00:00+00:00
+        user:
+          description: User who resolved the event. Null if it was auto-resolved by LVT system
+          $ref: '#/components/schemas/alertUser'
+    alertMedia:
+      type: object
+      required:
+      - id
+      - mimeType
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the media
+        mimeType:
+          type: string
+          description: The mime type of the media
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the media was added
+          example: 2023-01-01 12:00:00+00:00
+        camera:
+          $ref: '#/components/schemas/alertCamera'
+    alertEventActiveQuery:
+      type: string
+      enum:
+      - all
+      - historical
+      - active
+      example: all
+      default: active
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
+  responses:
+    updatedObject:
+      description: The object was updated successfully.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: The UUID of the updated object
+    '401':
+      description: Is returned when the authorization token provided is invalid or expired.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '400':
+      description: Is returned when the request is formatted improperly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    createdObject:
+      description: The object was created successfully.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: The UUID of the created object
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.lvt.com/oauth2/v1/token
+          scopes:
+            account.liveUnits.manage: Edit a live units data
+            account.cameras.manage: Edit a cameras data
+            account.locations.manage: Edit a locations data

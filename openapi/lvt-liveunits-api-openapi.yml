@@ -1,0 +1,749 @@
+openapi: 3.2.0
+info:
+  title: LVT Live Units API
+  description: Public REST API
+  version: 1.0.1
+servers:
+- url: https://api.lvt.com/v1
+  description: Production beta version
+security:
+- OAuth2: []
+tags:
+- name: LiveUnits
+  description: Operations on LiveUnits
+paths:
+  /liveUnits:
+    get:
+      operationId: GetLiveUnits
+      security:
+      - OAuth2:
+        - account.liveUnits.manage
+      tags:
+      - LiveUnits
+      summary: This endpoint returns all the live units accessible by the specified client.
+      description: '**Phase 1**: List of liveUnits for the user''s client
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/count'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of liveUnits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/liveUnits'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /liveUnits/{liveUnitId}:
+    parameters:
+    - name: liveUnitId
+      in: path
+      description: Specified live unit.
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: GetLiveUnit
+      security:
+      - OAuth2:
+        - account.liveUnits.manage
+      tags:
+      - LiveUnits
+      summary: Details for the specified live unit.
+      description: '**Phase 1**: Details for the specified live unit.
+
+        '
+      responses:
+        '200':
+          description: A live unit instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/liveUnit'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /liveUnits/{liveUnitId}/callInfo:
+    parameters:
+    - name: liveUnitId
+      in: path
+      description: Specified live unit.
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: GetLiveUnitCallInfo
+      tags:
+      - LiveUnits
+      summary: Get information on how to make a call to the live unit
+      description: '**Phase 2**:  Get information on how to make a call to the live unit
+
+        '
+      responses:
+        '200':
+          description: Call information for a live unit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/callInfo'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /liveUnits/{liveUnitId}/cameras:
+    get:
+      operationId: GetLiveUnitCameras
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - LiveUnits
+      summary: List of user accessible cameras hosted by the given liveUnit.
+      parameters:
+      - name: liveUnitId
+        in: path
+        description: Filter results by liveUnitId.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/count'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of cameras.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cameras'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /liveUnits/{liveUnitId}/sounds:
+    get:
+      operationId: GetLiveUnitSounds
+      tags:
+      - LiveUnits
+      summary: List of quick sounds that can be played by the live unit
+      description: '**Phase 3**: List of quick sounds that can be played by the live unit
+
+        '
+      parameters:
+      - name: liveUnitId
+        in: path
+        description: Filter results by liveUnitId.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/count'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of sounds.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sounds'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /liveUnits/{liveUnitId}:call:
+    post:
+      operationId: TalkDownStart
+      tags:
+      - LiveUnits
+      summary: Initiate a speaker talk-down call
+      description: 'Initiate a speaker talk-down call with the live unit.
+
+        '
+      parameters:
+      - name: liveUnitId
+        in: path
+        description: Filter results by liveUnitId.
+        required: true
+        schema:
+          type: string
+      - name: securityAlertId
+        in: query
+        description: ID of an alert that prompted the talkdown action
+        schema:
+          type: string
+      responses:
+        '200':
+          description: An object containing a WebSocket URL for initiating a talkdown session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/talkDownData'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /liveUnits/{liveUnitId}/sounds/{soundId}:play:
+    post:
+      operationId: PlayLiveUnitSound
+      tags:
+      - LiveUnits
+      summary: Play a quick sound from a live unit
+      description: '**Phase 3**: Play a quick sound from a live unit
+
+        '
+      parameters:
+      - name: liveUnitId
+        in: path
+        description: Filter results by liveUnitId.
+        required: true
+        schema:
+          type: string
+      - name: soundId
+        in: path
+        description: The sound ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/409'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /liveUnits/{liveUnitId}/lights:
+    get:
+      operationId: GetLiveUnitLights
+      tags:
+      - LiveUnits
+      summary: List of lights on the live unit
+      description: '**Phase 3**: List of lights on the live unit
+
+        '
+      parameters:
+      - name: liveUnitId
+        in: path
+        description: Filter results by liveUnitId.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/count'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of lights.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lights'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /liveUnits/{liveUnitId}/lights/{lightId}:toggle:
+    post:
+      operationId: ToggleLiveUnitLight
+      tags:
+      - LiveUnits
+      summary: Toggle the status of a light on a live unit
+      description: '**Phase 3**: Toggle the status of a light on a live unit
+
+        '
+      parameters:
+      - name: liveUnitId
+        in: path
+        description: Filter results by liveUnitId.
+        required: true
+        schema:
+          type: string
+      - name: lightId
+        in: path
+        description: The light ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/updateLiveUnitLight'
+      responses:
+        '200':
+          description: toggle response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - resetTime
+                - state
+                properties:
+                  resetTime:
+                    type: number
+                    description: Milliseconds until the light will revert to its previous state. If 0, it will remain indefinitely.
+                    example: 60000
+                  state:
+                    $ref: '#/components/schemas/lightState'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/409'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+components:
+  schemas:
+    cameras:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - cameras
+        properties:
+          items:
+            type: array
+            maxItems: 20
+            items:
+              $ref: '#/components/schemas/camera'
+    lights:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/light'
+    error:
+      type: object
+      required:
+      - errorCode
+      - errorSummary
+      - errorId
+      - errorCause
+      properties:
+        errorCode:
+          type: string
+          description: A code that is associated with this error type
+          example: E0000001
+        errorSummary:
+          type: string
+          description: A natural language explanation of the error
+          example: Api validation failed
+        errorId:
+          type: string
+          description: 'An ID that identifies this request.  These IDs are mapped to the internal error on the server side to assist in troubleshooting.
+
+            '
+          example: oaeHfmOAx1iRLa0H10DeMz5fQ
+        errorCauses:
+          type: array
+          description: Further information about what caused this error. Should be empty array if no causes given.
+          items:
+            type: string
+            example: 'login: An object with this field already exists in the current organization'
+    liveUnit:
+      type: object
+      required:
+      - id
+      - clientId
+      - gpsLocation
+      - locationId
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the live unit
+        clientId:
+          type: string
+          format: uuid
+          description: The id of the client that owns the live unit
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
+        locationId:
+          type: string
+          format: uuid
+          description: The id of the location this live unit is associated with
+        name:
+          type: string
+          description: User assigned name for the live unit
+    light:
+      type: object
+      description: A light on a live unit.
+      required:
+      - id
+      - type
+      - state
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the light.
+        type:
+          type: string
+          description: The type of light
+          enum:
+          - strobe
+          - flood
+          - camera
+        state:
+          $ref: '#/components/schemas/lightState'
+        name:
+          type: string
+          description: Optional name to describe the light beyond the type
+    sounds:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/sound'
+    camera:
+      type: object
+      required:
+      - id
+      - liveUnitId
+      - placement
+      - mountPosition
+      - thermal
+      - name
+      - viewType
+      - streamSlot
+      - capabilities
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of the camera
+        liveUnitId:
+          type: string
+          format: uuid
+          description: The live unit hosting this camera
+        placement:
+          $ref: '#/components/schemas/placement'
+        serialNumber:
+          type: string
+          description: Serial number of the camera
+          example: LVT0000001
+          deprecated: true
+        manufacturer:
+          type: string
+          description: Manufacturer of the camera
+          example: Axis
+          deprecated: true
+        model:
+          type: string
+          description: Model of the camera
+          example: Q6135-LE
+          deprecated: true
+        mountPosition:
+          $ref: '#/components/schemas/cameraMountPosition'
+        name:
+          type: string
+          description: Name of the camera
+          example: Primary
+        thermal:
+          type: boolean
+          description: If the camera streams thermal video
+        viewType:
+          type: string
+          description: View type of the camera
+          enum:
+          - single
+          - panoramic
+          - quadView
+          - multi
+        streamSlot:
+          type: integer
+          description: The slot of the stream on any given camera. For all single stream cameras, this will be 1. Multi-Sensor Panoramic cameras have 4 stream slots.
+          minimum: 1
+          maximum: 4
+        capabilities:
+          type: object
+          description: Capabilities which the camera supports
+          required:
+          - position
+          properties:
+            position:
+              type: boolean
+              description: If the camera supports positional ptzf commands
+    mountUnit:
+      type: object
+      required:
+      - id
+      - type
+      - gpsLocation
+      description: Describes form of camera mount
+      properties:
+        id:
+          type: string
+          description: The id of the mount unit
+        type:
+          type: string
+          description: Type of mount the camera is on
+          enum:
+          - liveUnit
+          - liveUnitSurroundHead
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
+    lightState:
+      type: string
+      enum:
+      - 'on'
+      - 'off'
+      - unavailable
+    liveUnits:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            maxItems: 20
+            items:
+              $ref: '#/components/schemas/liveUnit'
+    sound:
+      type: object
+      description: The information about a quick sound a live unit can play.
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the sound.
+        name:
+          type: string
+          description: The human readable name of the sound.
+          example: Trespassing
+    cameraMountPosition:
+      type: string
+      description: The position of the camera on the live unit
+      enum:
+      - center
+      - left
+      - right
+      - unassigned
+      example: center
+    placement:
+      type: object
+      required:
+      - position
+      - mountUnit
+      description: Describes form and position of camera mount
+      properties:
+        position:
+          $ref: '#/components/schemas/cameraMountPosition'
+        mountUnit:
+          $ref: '#/components/schemas/mountUnit'
+    callInfo:
+      type: object
+      description: Information required to call a live unit
+      required:
+      - phoneNumber
+      - extension
+      - passcode
+      properties:
+        phoneNumber:
+          type: string
+          format: phone
+          description: The phone number to call in with
+          example: +1 (111) 111-1111
+        extension:
+          type: string
+          description: The extension to dial after calling in
+          example: 1234
+        passcode:
+          type: string
+          description: The passcode to enter when prompted
+          example: 1234
+    talkDownData:
+      type: object
+      description: Data required to initiate a talkdown session
+      required:
+      - wssUrl
+      - callId
+      properties:
+        wssUrl:
+          type: string
+          format: uri
+          description: 'The WebSocket url. Send audio as byte arrays of mono, Mulaw-encoded audio packets with a sample rate of 8KHz. Close the socket to end the talkdown session.
+
+            '
+          example: wss://talkdown.api.lvt.com?callId=456
+        callId:
+          type: string
+          description: A unique identifier for the talkdown session
+    gpsCoordinates:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: float
+          minimum: -90.0
+          maximum: 90.0
+          description: GPS Decimal Degrees Latitude
+          example: 40.123456
+        longitude:
+          type: number
+          format: float
+          minimum: -180.0
+          maximum: 180.0
+          description: GPS Decimal Degrees Longitude
+          example: -111.789
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
+  responses:
+    '409':
+      description: The current state of the server does not allow for the operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '400':
+      description: Is returned when the request is formatted improperly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  parameters:
+    count:
+      name: limit
+      in: query
+      description: Limit reply list page size.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
+  requestBodies:
+    updateLiveUnitLight:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - state
+            properties:
+              state:
+                $ref: '#/components/schemas/lightState'
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.lvt.com/oauth2/v1/token
+          scopes:
+            account.liveUnits.manage: Edit a live units data
+            account.cameras.manage: Edit a cameras data
+            account.locations.manage: Edit a locations data

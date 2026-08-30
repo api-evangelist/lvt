@@ -1,0 +1,283 @@
+openapi: 3.2.0
+info:
+  title: LVT Streams API
+  description: Public REST API
+  version: 1.0.1
+servers:
+- url: https://api.lvt.com/v1
+  description: Production beta version
+security:
+- OAuth2: []
+tags:
+- name: Streams
+paths:
+  /cameras/{cameraId}/streams:
+    post:
+      operationId: StartStream
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - Streams
+      summary: Start a stream
+      description: '**Phase 1**: Starts a stream and returns stream data for the camera
+
+        '
+      parameters:
+      - in: path
+        name: cameraId
+        description: Camera to operate on.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/startStream'
+      responses:
+        '200':
+          description: stream data for the camera.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/streamDataPoly'
+              examples:
+                rtsp:
+                  value:
+                    protocol: rtsp
+                    streamId: 96129d6f-7143-45d7-a8ea-3081a11fc4b5
+                    refreshInterval: 10000
+                    streamingUrl: string
+                webrtc:
+                  value:
+                    protocol: webrtc
+                    streamId: 96129d6f-7143-45d7-a8ea-3081a11fc4b5
+                    refreshInterval: 10000
+                    signalUrl: wss://primary.camerarelay.com/websocket-session.json
+                    streamInfo: {}
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/409'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /streams/{streamId}:checkIn:
+    post:
+      operationId: CheckIn
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - Streams
+      summary: Check in streaming for the camera
+      description: '**Phase 1**: Check in streaming for the camera
+
+        '
+      parameters:
+      - in: path
+        name: streamId
+        description: The specific stream record id
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/409'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /streams/{streamId}:
+    delete:
+      operationId: CheckOut
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - Streams
+      summary: Check out streaming for the camera
+      description: '**Phase 1**: Check out streaming for the camera
+
+        '
+      parameters:
+      - in: path
+        name: streamId
+        description: The specific stream record id
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+components:
+  schemas:
+    streamDataRtsp:
+      type: object
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: rtsp
+        refreshInterval:
+          type: integer
+          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
+          format: int32
+        streamingUrl:
+          type: string
+          description: rtsp url to access the stream
+          format: uri
+        streamId:
+          type: string
+          description: Identifier for the current stream
+          format: uuid
+    error:
+      type: object
+      required:
+      - errorCode
+      - errorSummary
+      - errorId
+      - errorCause
+      properties:
+        errorCode:
+          type: string
+          description: A code that is associated with this error type
+          example: E0000001
+        errorSummary:
+          type: string
+          description: A natural language explanation of the error
+          example: Api validation failed
+        errorId:
+          type: string
+          description: 'An ID that identifies this request.  These IDs are mapped to the internal error on the server side to assist in troubleshooting.
+
+            '
+          example: oaeHfmOAx1iRLa0H10DeMz5fQ
+        errorCauses:
+          type: array
+          description: Further information about what caused this error. Should be empty array if no causes given.
+          items:
+            type: string
+            example: 'login: An object with this field already exists in the current organization'
+    streamDataPoly:
+      oneOf:
+      - $ref: '#/components/schemas/streamDataRtsp'
+      - $ref: '#/components/schemas/streamDataWebrtc'
+      discriminator:
+        propertyName: protocol
+        mapping:
+          rtsp: '#/components/schemas/streamDataRtsp'
+          webrtc: '#/components/schemas/streamDataWebrtc'
+    streamDataWebrtc:
+      type: object
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: webrtc
+        refreshInterval:
+          type: integer
+          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
+          format: int32
+        signalUrl:
+          type: string
+          description: web socket url to the signal server
+          format: uri
+        streamId:
+          description: Identifier for the current stream
+          type: string
+          format: uuid
+        streamInfo:
+          description: Data that is passed to to the signal server
+          type: object
+          additionalProperties: true
+  responses:
+    '400':
+      description: Is returned when the request is formatted improperly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '409':
+      description: The current state of the server does not allow for the operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '503':
+      description: Is returned when processing is unable to access a needed resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  requestBodies:
+    startStream:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - protocol
+            properties:
+              protocol:
+                type: string
+                enum:
+                - webrtc
+                - rtsp
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.lvt.com/oauth2/v1/token
+          scopes:
+            account.liveUnits.manage: Edit a live units data
+            account.cameras.manage: Edit a cameras data
+            account.locations.manage: Edit a locations data

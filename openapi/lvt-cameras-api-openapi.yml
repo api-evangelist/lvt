@@ -1,0 +1,689 @@
+openapi: 3.2.0
+info:
+  title: LVT Cameras API
+  description: Public REST API
+  version: 1.0.1
+servers:
+- url: https://api.lvt.com/v1
+  description: Production beta version
+security:
+- OAuth2: []
+tags:
+- name: Cameras
+  description: Operations on cameras
+paths:
+  /cameras/{cameraId}:
+    parameters:
+    - name: cameraId
+      in: path
+      description: Identifier of the camera to operate on.
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: GetLiveUnitCamera
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - Cameras
+      summary: Details of selected camera.
+      description: '**Phase 1**: Details of selected camera.
+
+        '
+      responses:
+        '200':
+          description: A camera instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/camera'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /cameras/{cameraId}/position:
+    parameters:
+    - name: cameraId
+      in: path
+      description: Camera to operate on.
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: GetCameraPosition
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - Cameras
+      summary: Returns the selected camera's PTZF values
+      description: '**Phase 1**: Returns the selected camera''s PTZF values
+
+        '
+      responses:
+        '200':
+          description: 'Current position of the specified camera.
+
+
+            Some camera models do not support focus, these cameras will return null for the focus.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cameraPosition'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '503':
+          $ref: '#/components/responses/503'
+        default:
+          $ref: '#/components/responses/defaultError'
+    put:
+      operationId: UpdateCameraPosition
+      deprecated: true
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - Cameras
+      summary: Updates the selected camera's PTZF values
+      description: '**This endpoint is deprecated. Use the PATCH request.**
+
+
+        Updates a camera''s PTZF
+
+        '
+      requestBody:
+        description: Updates the absolute position of a camera
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cameraPositionPut'
+      responses:
+        '200':
+          description: A camera instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cameraPositionPut'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        default:
+          $ref: '#/components/responses/defaultError'
+    patch:
+      operationId: UpdateCameraPosition2
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - Cameras
+      summary: Updates the selected camera's PTZF values
+      description: 'Sets a camera''s position relative to its current position unless the absolute query parameter is passed.
+
+
+        Some camera models do not support focus. If the focus is sent, it will be ignored.
+
+        '
+      parameters:
+      - in: path
+        name: cameraId
+        description: Camera to operate on.
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: absolute
+        description: Set camera's position with absolute positioning rather than relative.
+        schema:
+          type: boolean
+        example: true
+      requestBody:
+        description: "Updates the position of a camera.\n \nIf the query parameter `absolute=true`, any negative ptzf values are treated as inverses. For example, `{pan: -1} === {pan: 359}`\n \nWhile the range of `pan/tilt` is expressed from `-360` to `360`, this doesn't necessarily mean the camera has a full 360° of motion.\n"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cameraPosition'
+      responses:
+        '202':
+          description: Successful. Sending to camera async.
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '422':
+          $ref: '#/components/responses/422'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /cameras/{cameraId}/protocols:
+    get:
+      operationId: GetProtocols
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - Cameras
+      summary: Returns list of protocols supported
+      description: '**Phase 1**: Get list of protocols supported by this camera.
+
+        '
+      parameters:
+      - in: path
+        name: cameraId
+        description: Camera to operate on.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/count'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: List of protocols supported by the camera.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/streamProtocols'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /cameras/{cameraId}/streams:
+    post:
+      operationId: StartStream
+      security:
+      - OAuth2:
+        - account.cameras.manage
+      tags:
+      - Cameras
+      summary: Start a stream
+      description: '**Phase 1**: Starts a stream and returns stream data for the camera
+
+        '
+      parameters:
+      - in: path
+        name: cameraId
+        description: Camera to operate on.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/startStream'
+      responses:
+        '200':
+          description: stream data for the camera.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/streamDataPoly'
+              examples:
+                rtsp:
+                  value:
+                    protocol: rtsp
+                    streamId: 96129d6f-7143-45d7-a8ea-3081a11fc4b5
+                    refreshInterval: 10000
+                    streamingUrl: string
+                webrtc:
+                  value:
+                    protocol: webrtc
+                    streamId: 96129d6f-7143-45d7-a8ea-3081a11fc4b5
+                    refreshInterval: 10000
+                    signalUrl: wss://primary.camerarelay.com/websocket-session.json
+                    streamInfo: {}
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          $ref: '#/components/responses/409'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+        default:
+          $ref: '#/components/responses/defaultError'
+components:
+  responses:
+    '409':
+      description: The current state of the server does not allow for the operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '422':
+      description: The operation may not be performed on the specified resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '503':
+      description: Is returned when processing is unable to access a needed resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '400':
+      description: Is returned when the request is formatted improperly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '406':
+      description: Is returned when "Accept" header has not been specified or does not contain the value "application/json".
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  parameters:
+    count:
+      name: limit
+      in: query
+      description: Limit reply list page size.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
+  schemas:
+    error:
+      type: object
+      required:
+      - errorCode
+      - errorSummary
+      - errorId
+      - errorCause
+      properties:
+        errorCode:
+          type: string
+          description: A code that is associated with this error type
+          example: E0000001
+        errorSummary:
+          type: string
+          description: A natural language explanation of the error
+          example: Api validation failed
+        errorId:
+          type: string
+          description: 'An ID that identifies this request.  These IDs are mapped to the internal error on the server side to assist in troubleshooting.
+
+            '
+          example: oaeHfmOAx1iRLa0H10DeMz5fQ
+        errorCauses:
+          type: array
+          description: Further information about what caused this error. Should be empty array if no causes given.
+          items:
+            type: string
+            example: 'login: An object with this field already exists in the current organization'
+    streamProtocols:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/streamProtocol'
+    cameraPosition:
+      type: object
+      properties:
+        pan:
+          description: Pan value.
+          type: number
+          format: float
+          minimum: -360
+          maximum: 360
+        tilt:
+          description: Tilt value.
+          type: number
+          format: float
+          minimum: -360
+          maximum: 360
+        zoom:
+          description: Zoom value.
+          type: number
+          format: float
+          minimum: -100
+          maximum: 100
+        focus:
+          description: Focus value.
+          type:
+          - number
+          - 'null'
+          format: float
+          minimum: -100
+          maximum: 100
+    streamDataPoly:
+      oneOf:
+      - $ref: '#/components/schemas/streamDataRtsp'
+      - $ref: '#/components/schemas/streamDataWebrtc'
+      discriminator:
+        propertyName: protocol
+        mapping:
+          rtsp: '#/components/schemas/streamDataRtsp'
+          webrtc: '#/components/schemas/streamDataWebrtc'
+    mountUnit:
+      type: object
+      required:
+      - id
+      - type
+      - gpsLocation
+      description: Describes form of camera mount
+      properties:
+        id:
+          type: string
+          description: The id of the mount unit
+        type:
+          type: string
+          description: Type of mount the camera is on
+          enum:
+          - liveUnit
+          - liveUnitSurroundHead
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
+    camera:
+      type: object
+      required:
+      - id
+      - liveUnitId
+      - placement
+      - mountPosition
+      - thermal
+      - name
+      - viewType
+      - streamSlot
+      - capabilities
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Id of the camera
+        liveUnitId:
+          type: string
+          format: uuid
+          description: The live unit hosting this camera
+        placement:
+          $ref: '#/components/schemas/placement'
+        serialNumber:
+          type: string
+          description: Serial number of the camera
+          example: LVT0000001
+          deprecated: true
+        manufacturer:
+          type: string
+          description: Manufacturer of the camera
+          example: Axis
+          deprecated: true
+        model:
+          type: string
+          description: Model of the camera
+          example: Q6135-LE
+          deprecated: true
+        mountPosition:
+          $ref: '#/components/schemas/cameraMountPosition'
+        name:
+          type: string
+          description: Name of the camera
+          example: Primary
+        thermal:
+          type: boolean
+          description: If the camera streams thermal video
+        viewType:
+          type: string
+          description: View type of the camera
+          enum:
+          - single
+          - panoramic
+          - quadView
+          - multi
+        streamSlot:
+          type: integer
+          description: The slot of the stream on any given camera. For all single stream cameras, this will be 1. Multi-Sensor Panoramic cameras have 4 stream slots.
+          minimum: 1
+          maximum: 4
+        capabilities:
+          type: object
+          description: Capabilities which the camera supports
+          required:
+          - position
+          properties:
+            position:
+              type: boolean
+              description: If the camera supports positional ptzf commands
+    cameraMountPosition:
+      type: string
+      description: The position of the camera on the live unit
+      enum:
+      - center
+      - left
+      - right
+      - unassigned
+      example: center
+    streamDataWebrtc:
+      type: object
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: webrtc
+        refreshInterval:
+          type: integer
+          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
+          format: int32
+        signalUrl:
+          type: string
+          description: web socket url to the signal server
+          format: uri
+        streamId:
+          description: Identifier for the current stream
+          type: string
+          format: uuid
+        streamInfo:
+          description: Data that is passed to to the signal server
+          type: object
+          additionalProperties: true
+    cameraPositionPut:
+      type: object
+      required:
+      - pan
+      - tilt
+      - zoom
+      - focus
+      properties:
+        pan:
+          description: Absolute pan value
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 10000
+        tilt:
+          description: Absolute tilt value.
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 10000
+        zoom:
+          description: Absolute zoom value.
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 10000
+        focus:
+          description: Absolute focus value.  A value of -1 enables auto-focus.
+          type: integer
+          format: int32
+          minimum: -1
+          maximum: 10000
+    streamDataRtsp:
+      type: object
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: rtsp
+        refreshInterval:
+          type: integer
+          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
+          format: int32
+        streamingUrl:
+          type: string
+          description: rtsp url to access the stream
+          format: uri
+        streamId:
+          type: string
+          description: Identifier for the current stream
+          format: uuid
+    placement:
+      type: object
+      required:
+      - position
+      - mountUnit
+      description: Describes form and position of camera mount
+      properties:
+        position:
+          $ref: '#/components/schemas/cameraMountPosition'
+        mountUnit:
+          $ref: '#/components/schemas/mountUnit'
+    streamProtocol:
+      type: object
+      required:
+      - protocol
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: webrtc
+          enum:
+          - webrtc
+          - rtsp
+    gpsCoordinates:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: float
+          minimum: -90.0
+          maximum: 90.0
+          description: GPS Decimal Degrees Latitude
+          example: 40.123456
+        longitude:
+          type: number
+          format: float
+          minimum: -180.0
+          maximum: 180.0
+          description: GPS Decimal Degrees Longitude
+          example: -111.789
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
+  requestBodies:
+    startStream:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - protocol
+            properties:
+              protocol:
+                type: string
+                enum:
+                - webrtc
+                - rtsp
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.lvt.com/oauth2/v1/token
+          scopes:
+            account.liveUnits.manage: Edit a live units data
+            account.cameras.manage: Edit a cameras data
+            account.locations.manage: Edit a locations data

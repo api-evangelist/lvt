@@ -1,0 +1,393 @@
+openapi: 3.2.0
+info:
+  title: LVT Webhooks API
+  description: Public REST API
+  version: 1.0.1
+servers:
+- url: https://api.lvt.com/v1
+  description: Production beta version
+security:
+- OAuth2: []
+tags:
+- name: Webhooks
+  description: Operations on webhooks
+paths:
+  /webhooks:
+    post:
+      summary: Create a Webhook
+      description: "Create a Webhook.\n\nUpon creation, a webhook is first verified by sending a test message. The message must be responded to with a 2xx response code to be considered successful. This success is \nprerequisite to the Webhook creation. This process can be tested using the `/webhooks:test` endpoint before committing to creating a Webhook."
+      tags:
+      - Webhooks
+      requestBody:
+        $ref: '#/components/requestBodies/createWebhook'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+    get:
+      summary: Get Webhooks
+      description: Get a list of Webhooks. By default it returns all owned Webhooks, but can be filtered using the query parameters.
+      tags:
+      - Webhooks
+      parameters:
+      - $ref: '#/components/parameters/count'
+      - $ref: '#/components/parameters/cursor'
+      - name: enabled
+        in: query
+        description: Filter results to return Webhooks where enabled equals the provided state. If omitted it returns all results.
+        schema:
+          type: boolean
+        example: true
+      - name: namespace
+        in: query
+        description: Comma delimited list of namespaces that should be included in the response.
+        schema:
+          type: string
+        example: alerts,other
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhooks'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /webhooks/{webhookId}:
+    get:
+      summary: Get a Webhook
+      description: Get a Webhook with the provided ID.
+      tags:
+      - Webhooks
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The UUID of the specific webhook to fetch.
+        schema:
+          type: string
+          format: uuid
+        example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+    patch:
+      summary: Update a Webhook
+      description: Update specific properties of a Webhook. If the property is not listed as acceptable in the request body and needs to be changed, you can delete the existing Webhook and recreate it instead.
+      tags:
+      - Webhooks
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The UUID of the specific webhook to fetch.
+        schema:
+          type: string
+          format: uuid
+        example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+      requestBody:
+        $ref: '#/components/requestBodies/updateWebhook'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+    delete:
+      summary: Delete a Webhook
+      tags:
+      - Webhooks
+      parameters:
+      - name: webhookId
+        in: path
+        required: true
+        description: The UUID of the specific webhook to fetch.
+        schema:
+          type: string
+          format: uuid
+        example: a0b0e212-8d3b-4e48-90a5-e32b67b3388d
+      responses:
+        204:
+          description: Deleted
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /webhooks:test:
+    post:
+      summary: Test a Webhook
+      description: "Send a test message to a specified URL.\n\nThis message contains the following payload with a signature in the `X-LVT-HMAC-SHA256` header so developers can test the validation process used in Webhook creation.\n```json\n{\n  \"attempt\": 1,\n  \"currentAttemptTimestamp\": \"<CURRENT_DATE_AS_ISO_8601_STRING>\",\n  \"action\": \"test\",\n  \"data\": {\n    \"message\": \"Hello, world!\"\n  }\n}\n```"
+      tags:
+      - Webhooks
+      requestBody:
+        $ref: '#/components/requestBodies/updateWebhook'
+      responses:
+        204:
+          description: OK
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+components:
+  requestBodies:
+    updateWebhook:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: HTTPS URL of the resource to receive Webhook messages.
+                example: https://www.example.com/webhooks
+              namespace:
+                type: string
+                description: The namespace for the event types to receive.
+                example: alerts
+              enabled:
+                type: boolean
+                description: Whether the Webhook is actively receiving messages.
+                example: true
+    createWebhook:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: HTTPS URL of the resource to receive Webhook messages.
+                example: https://www.example.com/webhooks
+              namespace:
+                type: string
+                description: The namespace for the event types to receive.
+                example: alerts
+              enabled:
+                type: boolean
+                description: Whether the Webhook is actively receiving messages.
+                example: true
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
+    count:
+      name: limit
+      in: query
+      description: Limit reply list page size.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+  responses:
+    '400':
+      description: Is returned when the request is formatted improperly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '401':
+      description: Is returned when the authorization token provided is invalid or expired.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  schemas:
+    error:
+      type: object
+      required:
+      - errorCode
+      - errorSummary
+      - errorId
+      - errorCause
+      properties:
+        errorCode:
+          type: string
+          description: A code that is associated with this error type
+          example: E0000001
+        errorSummary:
+          type: string
+          description: A natural language explanation of the error
+          example: Api validation failed
+        errorId:
+          type: string
+          description: 'An ID that identifies this request.  These IDs are mapped to the internal error on the server side to assist in troubleshooting.
+
+            '
+          example: oaeHfmOAx1iRLa0H10DeMz5fQ
+        errorCauses:
+          type: array
+          description: Further information about what caused this error. Should be empty array if no causes given.
+          items:
+            type: string
+            example: 'login: An object with this field already exists in the current organization'
+    webhooks:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            maxItems: 100
+            items:
+              $ref: '#/components/schemas/webhook'
+    webhook:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the Webhook.
+        url:
+          type: string
+          format: uri
+          description: HTTPS URL of the resource to receive webhook messages.
+          example: https://api.example.com/receiveWebhook
+        namespace:
+          type: string
+          description: The namespace for the event types to receive.
+          example: securityAlerts
+        enabled:
+          type: boolean
+          description: Whether the Webhooks is actively receiving messages.
+          example: true
+        created:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the webhook was created.
+          example: 2023-01-01 12:00:00+00:00
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.lvt.com/oauth2/v1/token
+          scopes:
+            account.liveUnits.manage: Edit a live units data
+            account.cameras.manage: Edit a cameras data
+            account.locations.manage: Edit a locations data

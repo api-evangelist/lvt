@@ -1,0 +1,132 @@
+openapi: 3.2.0
+info:
+  title: LVT Talkdown API
+  description: Public REST API
+  version: 1.0.1
+servers:
+- url: https://api.lvt.com/v1
+  description: Production beta version
+security:
+- OAuth2: []
+tags:
+- name: Talkdown
+  description: Operations related to Partner Talkdown
+paths:
+  /liveUnits/{liveUnitId}:call:
+    post:
+      operationId: TalkDownStart
+      tags:
+      - Talkdown
+      summary: Initiate a speaker talk-down call
+      description: 'Initiate a speaker talk-down call with the live unit.
+
+        '
+      parameters:
+      - name: liveUnitId
+        in: path
+        description: Filter results by liveUnitId.
+        required: true
+        schema:
+          type: string
+      - name: securityAlertId
+        in: query
+        description: ID of an alert that prompted the talkdown action
+        schema:
+          type: string
+      responses:
+        '200':
+          description: An object containing a WebSocket URL for initiating a talkdown session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/talkDownData'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+components:
+  responses:
+    '400':
+      description: Is returned when the request is formatted improperly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  schemas:
+    talkDownData:
+      type: object
+      description: Data required to initiate a talkdown session
+      required:
+      - wssUrl
+      - callId
+      properties:
+        wssUrl:
+          type: string
+          format: uri
+          description: 'The WebSocket url. Send audio as byte arrays of mono, Mulaw-encoded audio packets with a sample rate of 8KHz. Close the socket to end the talkdown session.
+
+            '
+          example: wss://talkdown.api.lvt.com?callId=456
+        callId:
+          type: string
+          description: A unique identifier for the talkdown session
+    error:
+      type: object
+      required:
+      - errorCode
+      - errorSummary
+      - errorId
+      - errorCause
+      properties:
+        errorCode:
+          type: string
+          description: A code that is associated with this error type
+          example: E0000001
+        errorSummary:
+          type: string
+          description: A natural language explanation of the error
+          example: Api validation failed
+        errorId:
+          type: string
+          description: 'An ID that identifies this request.  These IDs are mapped to the internal error on the server side to assist in troubleshooting.
+
+            '
+          example: oaeHfmOAx1iRLa0H10DeMz5fQ
+        errorCauses:
+          type: array
+          description: Further information about what caused this error. Should be empty array if no causes given.
+          items:
+            type: string
+            example: 'login: An object with this field already exists in the current organization'
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.lvt.com/oauth2/v1/token
+          scopes:
+            account.liveUnits.manage: Edit a live units data
+            account.cameras.manage: Edit a cameras data
+            account.locations.manage: Edit a locations data

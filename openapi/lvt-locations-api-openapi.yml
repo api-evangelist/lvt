@@ -1,0 +1,357 @@
+openapi: 3.2.0
+info:
+  title: LVT Locations API
+  description: Public REST API
+  version: 1.0.1
+servers:
+- url: https://api.lvt.com/v1
+  description: Production beta version
+security:
+- OAuth2: []
+tags:
+- name: Locations
+  description: Operations on locations
+paths:
+  /locations:
+    get:
+      operationId: GetLocations
+      security:
+      - OAuth2:
+        - account.locations.manage
+      tags:
+      - Locations
+      summary: List of locations for the user's client
+      description: '**Phase 1**:  Returns all the locations accessible by the specified client.
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/count'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of locations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/locations'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /locations/{locationId}:
+    parameters:
+    - name: locationId
+      in: path
+      description: Specified location.
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: GetLocation
+      security:
+      - OAuth2:
+        - account.locations.manage
+      tags:
+      - Locations
+      summary: Details for the specified location.
+      description: '**Phase 1**: Details for the specified location.
+
+        '
+      responses:
+        '200':
+          description: A location instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/location'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+  /locations/{locationId}/liveUnits:
+    get:
+      operationId: GetLocationLiveUnits
+      security:
+      - OAuth2:
+        - account.liveUnits.manage
+      tags:
+      - Locations
+      summary: List of user accessible live units at the given location.
+      description: '**Phase 1**: List of user accessible live units at the given location.
+
+        '
+      parameters:
+      - name: locationId
+        in: path
+        description: Filter results by locationId.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/count'
+      - $ref: '#/components/parameters/cursor'
+      responses:
+        '200':
+          description: A list of live units.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/liveUnits'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/defaultError'
+components:
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
+    count:
+      name: limit
+      in: query
+      description: Limit reply list page size.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+  schemas:
+    liveUnits:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            maxItems: 20
+            items:
+              $ref: '#/components/schemas/liveUnit'
+    error:
+      type: object
+      required:
+      - errorCode
+      - errorSummary
+      - errorId
+      - errorCause
+      properties:
+        errorCode:
+          type: string
+          description: A code that is associated with this error type
+          example: E0000001
+        errorSummary:
+          type: string
+          description: A natural language explanation of the error
+          example: Api validation failed
+        errorId:
+          type: string
+          description: 'An ID that identifies this request.  These IDs are mapped to the internal error on the server side to assist in troubleshooting.
+
+            '
+          example: oaeHfmOAx1iRLa0H10DeMz5fQ
+        errorCauses:
+          type: array
+          description: Further information about what caused this error. Should be empty array if no causes given.
+          items:
+            type: string
+            example: 'login: An object with this field already exists in the current organization'
+    location:
+      type: object
+      required:
+      - id
+      - gpsLocation
+      - name
+      - address
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: UUID of location
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
+        name:
+          type: string
+          description: User defined name of a location
+          example: 'Store #326 North Parking Lot'
+        address:
+          $ref: '#/components/schemas/address'
+    gpsCoordinates:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: float
+          minimum: -90.0
+          maximum: 90.0
+          description: GPS Decimal Degrees Latitude
+          example: 40.123456
+        longitude:
+          type: number
+          format: float
+          minimum: -180.0
+          maximum: 180.0
+          description: GPS Decimal Degrees Longitude
+          example: -111.789
+    locations:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            maxItems: 20
+            items:
+              $ref: '#/components/schemas/location'
+    address:
+      type: object
+      required:
+      - city
+      - county
+      - country
+      - state
+      - street
+      - zip
+      properties:
+        city:
+          type:
+          - string
+          - 'null'
+          example: American Fork
+        county:
+          type:
+          - string
+          - 'null'
+          example: Utah
+        country:
+          type:
+          - string
+          - 'null'
+          example: USA
+        state:
+          type:
+          - string
+          - 'null'
+          example: Utah
+        street:
+          type:
+          - string
+          - 'null'
+          example: 802 E 1050 S
+        zip:
+          type:
+          - string
+          - 'null'
+          example: 84003
+    liveUnit:
+      type: object
+      required:
+      - id
+      - clientId
+      - gpsLocation
+      - locationId
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the live unit
+        clientId:
+          type: string
+          format: uuid
+          description: The id of the client that owns the live unit
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
+        locationId:
+          type: string
+          format: uuid
+          description: The id of the location this live unit is associated with
+        name:
+          type: string
+          description: User assigned name for the live unit
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
+  responses:
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '400':
+      description: Is returned when the request is formatted improperly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.lvt.com/oauth2/v1/token
+          scopes:
+            account.liveUnits.manage: Edit a live units data
+            account.cameras.manage: Edit a cameras data
+            account.locations.manage: Edit a locations data
