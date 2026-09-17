@@ -160,22 +160,6 @@ apis:
     url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
   - type: GettingStarted
     url: https://github.com/LiveViewTech/lvt-public-api
-- aid: lvt:lvt-publickeys-api
-  name: LVT Public Keys API
-  description: Operations related to outbound message verification
-  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
-  baseURL: https://api.lvt.com/v1
-  tags:
-  - PublicKeys
-  properties:
-  - type: OpenAPI
-    url: openapi/lvt-publickeys-api-openapi.yml
-  - type: Documentation
-    url: https://docs.lvt.com/r/lvt-partner-api-manual
-  - type: APIReference
-    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
-  - type: GettingStarted
-    url: https://github.com/LiveViewTech/lvt-public-api
 - aid: lvt:lvt-streams-api
   name: LVT Streams API
   description: The Streams API from LVT — 3 operation(s) for streams.
@@ -220,6 +204,22 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/lvt-webhooks-api-openapi.yml
+  - type: Documentation
+    url: https://docs.lvt.com/r/lvt-partner-api-manual
+  - type: APIReference
+    url: https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml
+  - type: GettingStarted
+    url: https://github.com/LiveViewTech/lvt-public-api
+- aid: lvt:lvt-public-keys-api
+  name: LVT Public Keys API
+  description: Operations related to outbound message verification
+  humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
+  baseURL: https://api.lvt.com/v1
+  tags:
+  - Public Keys
+  properties:
+  - type: OpenAPI
+    url: openapi/lvt-public-keys-api-openapi.yml
   - type: Documentation
     url: https://docs.lvt.com/r/lvt-partner-api-manual
   - type: APIReference
