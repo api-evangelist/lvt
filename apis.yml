@@ -134,6 +134,8 @@ apis:
   humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
   baseURL: https://api.lvt.com/v1
   tags:
+  - Location
+  tags_raw:
   - Locations
   properties:
   - type: OpenAPI
@@ -216,6 +218,8 @@ apis:
   humanURL: https://docs.lvt.com/r/lvt-partner-api-manual
   baseURL: https://api.lvt.com/v1
   tags:
+  - PublicKeys
+  tags_raw:
   - Public Keys
   properties:
   - type: OpenAPI
