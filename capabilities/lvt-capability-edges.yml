@@ -11,8 +11,46 @@ capability_model:
   attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
     CC BY 4.0
   notice: NOTICE
-edge_count: 1
+edge_count: 4
 edges:
+- tag: Cameras
+  spec_file: lvt-cameras-api-openapi.yml
+  capability_id: BC-2340.50
+  capability_id_l1: BC-2340
+  capability_name: Physical Security & Surveillance Management
+  confidence: 0.7
+  evidence: GET /cameras/{cameraId}/position  Returns the selected camera's PTZF values; POST /cameras/{cameraId}/streams  Start
+    a stream
+  reason: Operations control surveillance cameras (PTZF positioning, live streaming) on mobile surveillance
+    units — CCTV-based physical security. The closest candidate is Physical Security & Surveillance Management;
+    note BC-620 covers cyber, not physical, security. Confidence tempered because LVT serves many sectors,
+    not only retail stores.
+  recovered_from: vertical-retail-consumer-goods-edges.json
+- tag: LiveUnits
+  spec_file: lvt-liveunits-api-openapi.yml
+  capability_id: BC-2340.50
+  capability_id_l1: BC-2340
+  capability_name: Physical Security & Surveillance Management
+  confidence: 0.7
+  evidence: POST /liveUnits/{liveUnitId}:call  TalkDownStart  Initiate a speaker talk-down call; POST
+    /liveUnits/{liveUnitId}/lights/{lightId}:toggle  Toggle the status of a light on a live unit
+  reason: Manages the mobile surveillance units themselves — cameras, lights, loudspeakers and talk-down
+    deterrence — which is physical security and surveillance capability. Confidence moderate because the
+    platform is cross-sector and only the retail-framed surveillance capability is available in the candidate
+    list.
+  recovered_from: vertical-retail-consumer-goods-edges.json
+- tag: Talkdown
+  spec_file: lvt-talkdown-api-openapi.yml
+  capability_id: BC-2340.50
+  capability_id_l1: BC-2340
+  capability_name: Physical Security & Surveillance Management
+  confidence: 0.7
+  evidence: POST /liveUnits/{liveUnitId}:call  TalkDownStart  Initiate a speaker talk-down call
+  reason: Talk-down is an active security deterrence action on a surveillance unit — the vendor describes
+    'loudspeakers and AI talk-down' for site security. In a retail frame this realises physical security
+    & surveillance operations. Confidence moderated because the single operation is a call-initiation
+    primitive and the buyer context may be non-retail.
+  recovered_from: vertical-retail-consumer-goods-edges.json
 - tag: Webhooks
   spec_file: lvt-webhooks-api-openapi.yml
   capability_id: BC-4270.80
