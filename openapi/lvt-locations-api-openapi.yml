@@ -21,9 +21,7 @@ paths:
       tags:
       - Locations
       summary: List of locations for the user's client
-      description: '**Phase 1**:  Returns all the locations accessible by the specified client.
-
-        '
+      description: '**Phase 1**: Returns all the locations accessible by the specified client.'
       parameters:
       - $ref: '#/components/parameters/count'
       - $ref: '#/components/parameters/cursor'
@@ -55,10 +53,8 @@ paths:
         - account.locations.manage
       tags:
       - Locations
-      summary: Details for the specified location.
-      description: '**Phase 1**: Details for the specified location.
-
-        '
+      summary: Details for the specified location
+      description: '**Phase 1**: Details for the specified location.'
       responses:
         '200':
           description: A location instance.
@@ -84,10 +80,8 @@ paths:
         - account.liveUnits.manage
       tags:
       - Locations
-      summary: List of user accessible live units at the given location.
-      description: '**Phase 1**: List of user accessible live units at the given location.
-
-        '
+      summary: List of user accessible live units at the given location
+      description: '**Phase 1**: List of user accessible live units at the given location.'
       parameters:
       - name: locationId
         in: path
@@ -115,35 +109,7 @@ paths:
         default:
           $ref: '#/components/responses/defaultError'
 components:
-  parameters:
-    cursor:
-      name: cursor
-      in: query
-      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
-      schema:
-        type: string
-    count:
-      name: limit
-      in: query
-      description: Limit reply list page size.
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
   schemas:
-    liveUnits:
-      allOf:
-      - $ref: '#/components/schemas/paginated'
-      - type: object
-        required:
-        - items
-        properties:
-          items:
-            type: array
-            maxItems: 20
-            items:
-              $ref: '#/components/schemas/liveUnit'
     error:
       type: object
       required:
@@ -192,38 +158,6 @@ components:
           example: 'Store #326 North Parking Lot'
         address:
           $ref: '#/components/schemas/address'
-    gpsCoordinates:
-      type: object
-      required:
-      - latitude
-      - longitude
-      properties:
-        latitude:
-          type: number
-          format: float
-          minimum: -90.0
-          maximum: 90.0
-          description: GPS Decimal Degrees Latitude
-          example: 40.123456
-        longitude:
-          type: number
-          format: float
-          minimum: -180.0
-          maximum: 180.0
-          description: GPS Decimal Degrees Longitude
-          example: -111.789
-    locations:
-      allOf:
-      - $ref: '#/components/schemas/paginated'
-      - type: object
-        required:
-        - items
-        properties:
-          items:
-            type: array
-            maxItems: 20
-            items:
-              $ref: '#/components/schemas/location'
     address:
       type: object
       required:
@@ -264,6 +198,50 @@ components:
           - string
           - 'null'
           example: 84003
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
+    gpsCoordinates:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: float
+          minimum: -90.0
+          maximum: 90.0
+          description: GPS Decimal Degrees Latitude
+          example: 40.123456
+        longitude:
+          type: number
+          format: float
+          minimum: -180.0
+          maximum: 180.0
+          description: GPS Decimal Degrees Longitude
+          example: -111.789
     liveUnit:
       type: object
       required:
@@ -290,30 +268,46 @@ components:
         name:
           type: string
           description: User assigned name for the live unit
-    paginated:
-      type: object
-      required:
-      - itemsPerPage
-      - nextCursorUri
-      - totalResults
-      properties:
-        itemsCount:
-          type: integer
-          format: int32
-          minimum: 0
-          description: Number of items returned in the response
-          example: 24
-        nextCursorUri:
-          type:
-          - string
-          - 'null'
-          format: uri
-          description: Full URL to fetch the values of the next page
-          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
-        totalResults:
-          type: integer
-          description: Total number of items in the collection being iterated
-          example: 1234
+    locations:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            maxItems: 20
+            items:
+              $ref: '#/components/schemas/location'
+    liveUnits:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            maxItems: 20
+            items:
+              $ref: '#/components/schemas/liveUnit'
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
+    count:
+      name: limit
+      in: query
+      description: Limit reply list page size.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
   responses:
     defaultError:
       description: Unexpected error.
@@ -321,14 +315,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '400':
-      description: Is returned when the request is formatted improperly.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '500':
-      description: Is returned when processing encounters an error.
+    '404':
+      description: Is returned when the specified resource can not be located.
       content:
         application/json:
           schema:
@@ -339,8 +327,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '404':
-      description: Is returned when the specified resource can not be located.
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '400':
+      description: Is returned when the request is formatted improperly.
       content:
         application/json:
           schema:

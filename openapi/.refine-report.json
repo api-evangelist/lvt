@@ -1,0 +1,39 @@
+{
+  "provider": "lvt",
+  "sources": [
+    "_original/lvt-partner-api-openapi.yml"
+  ],
+  "outputs": [
+    "lvt-cameras-api-openapi.yml",
+    "lvt-events-api-openapi.yml",
+    "lvt-liveunits-api-openapi.yml",
+    "lvt-locations-api-openapi.yml",
+    "lvt-media-api-openapi.yml",
+    "lvt-publickeys-api-openapi.yml",
+    "lvt-streams-api-openapi.yml",
+    "lvt-talkdown-api-openapi.yml",
+    "lvt-webhooks-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "lvt-partner-api-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "lvt-partner-api-openapi.yml: declared missing tag: Events",
+    "lvt-partner-api-openapi.yml: declared missing tag: Media",
+    "lvt-partner-api-openapi.yml: declared missing tag: Streams",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "lvt-cameras-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lvt-events-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lvt-liveunits-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lvt-locations-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lvt-media-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lvt-publickeys-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lvt-streams-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lvt-talkdown-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "lvt-webhooks-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

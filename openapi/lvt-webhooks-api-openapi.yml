@@ -15,7 +15,12 @@ paths:
   /webhooks:
     post:
       summary: Create a Webhook
-      description: "Create a Webhook.\n\nUpon creation, a webhook is first verified by sending a test message. The message must be responded to with a 2xx response code to be considered successful. This success is \nprerequisite to the Webhook creation. This process can be tested using the `/webhooks:test` endpoint before committing to creating a Webhook."
+      description: 'Create a Webhook.
+
+
+        Upon creation, a webhook is first verified by sending a test message. The message must be responded to with a 2xx response code to be considered successful. This success is
+
+        prerequisite to the Webhook creation. This process can be tested using the `/webhooks:test` endpoint before committing to creating a Webhook.'
       tags:
       - Webhooks
       requestBody:
@@ -39,6 +44,8 @@ paths:
           $ref: '#/components/responses/500'
         default:
           $ref: '#/components/responses/defaultError'
+      operationId: postWebhooks
+      x-operation-id-source: derived
     get:
       summary: Get Webhooks
       description: Get a list of Webhooks. By default it returns all owned Webhooks, but can be filtered using the query parameters.
@@ -78,6 +85,8 @@ paths:
           $ref: '#/components/responses/500'
         default:
           $ref: '#/components/responses/defaultError'
+      operationId: getWebhooks
+      x-operation-id-source: derived
   /webhooks/{webhookId}:
     get:
       summary: Get a Webhook
@@ -112,6 +121,8 @@ paths:
           $ref: '#/components/responses/500'
         default:
           $ref: '#/components/responses/defaultError'
+      operationId: getWebhooksByWebhookId
+      x-operation-id-source: derived
     patch:
       summary: Update a Webhook
       description: Update specific properties of a Webhook. If the property is not listed as acceptable in the request body and needs to be changed, you can delete the existing Webhook and recreate it instead.
@@ -147,6 +158,8 @@ paths:
           $ref: '#/components/responses/500'
         default:
           $ref: '#/components/responses/defaultError'
+      operationId: patchWebhooksByWebhookId
+      x-operation-id-source: derived
     delete:
       summary: Delete a Webhook
       tags:
@@ -175,10 +188,35 @@ paths:
           $ref: '#/components/responses/500'
         default:
           $ref: '#/components/responses/defaultError'
+      operationId: deleteWebhooksByWebhookId
+      x-operation-id-source: derived
   /webhooks:test:
     post:
       summary: Test a Webhook
-      description: "Send a test message to a specified URL.\n\nThis message contains the following payload with a signature in the `X-LVT-HMAC-SHA256` header so developers can test the validation process used in Webhook creation.\n```json\n{\n  \"attempt\": 1,\n  \"currentAttemptTimestamp\": \"<CURRENT_DATE_AS_ISO_8601_STRING>\",\n  \"action\": \"test\",\n  \"data\": {\n    \"message\": \"Hello, world!\"\n  }\n}\n```"
+      description: 'Send a test message to a specified URL.
+
+
+        This message contains the following payload with a signature in the `X-LVT-HMAC-SHA256` header so developers can test the validation process used in Webhook creation.
+
+        ```json
+
+        {
+
+        "attempt": 1,
+
+        "currentAttemptTimestamp": "",
+
+        "action": "test",
+
+        "data": {
+
+        "message": "Hello, world!"
+
+        }
+
+        }
+
+        ```'
       tags:
       - Webhooks
       requestBody:
@@ -198,6 +236,8 @@ paths:
           $ref: '#/components/responses/500'
         default:
           $ref: '#/components/responses/defaultError'
+      operationId: postWebhooks:test
+      x-operation-id-source: derived
 components:
   requestBodies:
     updateWebhook:
@@ -238,59 +278,6 @@ components:
                 type: boolean
                 description: Whether the Webhook is actively receiving messages.
                 example: true
-  parameters:
-    cursor:
-      name: cursor
-      in: query
-      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
-      schema:
-        type: string
-    count:
-      name: limit
-      in: query
-      description: Limit reply list page size.
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
-  responses:
-    '400':
-      description: Is returned when the request is formatted improperly.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    defaultError:
-      description: Unexpected error.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '500':
-      description: Is returned when processing encounters an error.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '401':
-      description: Is returned when the authorization token provided is invalid or expired.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '403':
-      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '404':
-      description: Is returned when the specified resource can not be located.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
   schemas:
     error:
       type: object
@@ -320,6 +307,30 @@ components:
           items:
             type: string
             example: 'login: An object with this field already exists in the current organization'
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
     webhooks:
       allOf:
       - $ref: '#/components/schemas/paginated'
@@ -357,30 +368,59 @@ components:
           format: date-time
           description: ISO 8601 formatted string. Represents the `timestamp` at which the webhook was created.
           example: 2023-01-01 12:00:00+00:00
-    paginated:
-      type: object
-      required:
-      - itemsPerPage
-      - nextCursorUri
-      - totalResults
-      properties:
-        itemsCount:
-          type: integer
-          format: int32
-          minimum: 0
-          description: Number of items returned in the response
-          example: 24
-        nextCursorUri:
-          type:
-          - string
-          - 'null'
-          format: uri
-          description: Full URL to fetch the values of the next page
-          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
-        totalResults:
-          type: integer
-          description: Total number of items in the collection being iterated
-          example: 1234
+  responses:
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '401':
+      description: Is returned when the authorization token provided is invalid or expired.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '400':
+      description: Is returned when the request is formatted improperly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
+    count:
+      name: limit
+      in: query
+      description: Limit reply list page size.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
   securitySchemes:
     OAuth2:
       type: oauth2

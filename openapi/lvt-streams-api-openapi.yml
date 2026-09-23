@@ -20,9 +20,7 @@ paths:
       tags:
       - Streams
       summary: Start a stream
-      description: '**Phase 1**: Starts a stream and returns stream data for the camera
-
-        '
+      description: '**Phase 1**: Starts a stream and returns stream data for the camera'
       parameters:
       - in: path
         name: cameraId
@@ -76,9 +74,7 @@ paths:
       tags:
       - Streams
       summary: Check in streaming for the camera
-      description: '**Phase 1**: Check in streaming for the camera
-
-        '
+      description: '**Phase 1**: Check in streaming for the camera'
       parameters:
       - in: path
         name: streamId
@@ -110,9 +106,7 @@ paths:
       tags:
       - Streams
       summary: Check out streaming for the camera
-      description: '**Phase 1**: Check out streaming for the camera
-
-        '
+      description: '**Phase 1**: Check out streaming for the camera'
       parameters:
       - in: path
         name: streamId
@@ -135,25 +129,6 @@ paths:
           $ref: '#/components/responses/defaultError'
 components:
   schemas:
-    streamDataRtsp:
-      type: object
-      properties:
-        protocol:
-          type: string
-          description: A short name for the streaming protocol
-          example: rtsp
-        refreshInterval:
-          type: integer
-          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
-          format: int32
-        streamingUrl:
-          type: string
-          description: rtsp url to access the stream
-          format: uri
-        streamId:
-          type: string
-          description: Identifier for the current stream
-          format: uuid
     error:
       type: object
       required:
@@ -182,6 +157,25 @@ components:
           items:
             type: string
             example: 'login: An object with this field already exists in the current organization'
+    streamDataRtsp:
+      type: object
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: rtsp
+        refreshInterval:
+          type: integer
+          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
+          format: int32
+        streamingUrl:
+          type: string
+          description: rtsp url to access the stream
+          format: uri
+        streamId:
+          type: string
+          description: Identifier for the current stream
+          format: uuid
     streamDataPoly:
       oneOf:
       - $ref: '#/components/schemas/streamDataRtsp'
@@ -215,26 +209,14 @@ components:
           type: object
           additionalProperties: true
   responses:
-    '400':
-      description: Is returned when the request is formatted improperly.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
     defaultError:
       description: Unexpected error.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '409':
-      description: The current state of the server does not allow for the operation.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '500':
-      description: Is returned when processing encounters an error.
+    '404':
+      description: Is returned when the specified resource can not be located.
       content:
         application/json:
           schema:
@@ -251,8 +233,20 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '404':
-      description: Is returned when the specified resource can not be located.
+    '409':
+      description: The current state of the server does not allow for the operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '400':
+      description: Is returned when the request is formatted improperly.
       content:
         application/json:
           schema:
