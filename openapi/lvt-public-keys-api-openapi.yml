@@ -81,14 +81,20 @@ components:
     pem:
       type: string
   responses:
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
     defaultError:
       description: Unexpected error.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '401':
-      description: Is returned when the authorization token provided is invalid or expired.
+    '400':
+      description: Is returned when the request is formatted improperly.
       content:
         application/json:
           schema:
@@ -105,14 +111,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '500':
-      description: Is returned when processing encounters an error.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '400':
-      description: Is returned when the request is formatted improperly.
+    '401':
+      description: Is returned when the authorization token provided is invalid or expired.
       content:
         application/json:
           schema:

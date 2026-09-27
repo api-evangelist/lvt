@@ -239,45 +239,6 @@ paths:
       operationId: postWebhooks:test
       x-operation-id-source: derived
 components:
-  requestBodies:
-    updateWebhook:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              url:
-                type: string
-                format: uri
-                description: HTTPS URL of the resource to receive Webhook messages.
-                example: https://www.example.com/webhooks
-              namespace:
-                type: string
-                description: The namespace for the event types to receive.
-                example: alerts
-              enabled:
-                type: boolean
-                description: Whether the Webhook is actively receiving messages.
-                example: true
-    createWebhook:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              url:
-                type: string
-                format: uri
-                description: HTTPS URL of the resource to receive Webhook messages.
-                example: https://www.example.com/webhooks
-              namespace:
-                type: string
-                description: The namespace for the event types to receive.
-                example: alerts
-              enabled:
-                type: boolean
-                description: Whether the Webhook is actively receiving messages.
-                example: true
   schemas:
     error:
       type: object
@@ -307,6 +268,18 @@ components:
           items:
             type: string
             example: 'login: An object with this field already exists in the current organization'
+    webhooks:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            maxItems: 100
+            items:
+              $ref: '#/components/schemas/webhook'
     paginated:
       type: object
       required:
@@ -331,18 +304,6 @@ components:
           type: integer
           description: Total number of items in the collection being iterated
           example: 1234
-    webhooks:
-      allOf:
-      - $ref: '#/components/schemas/paginated'
-      - type: object
-        required:
-        - items
-        properties:
-          items:
-            type: array
-            maxItems: 100
-            items:
-              $ref: '#/components/schemas/webhook'
     webhook:
       type: object
       properties:
@@ -369,32 +330,14 @@ components:
           description: ISO 8601 formatted string. Represents the `timestamp` at which the webhook was created.
           example: 2023-01-01 12:00:00+00:00
   responses:
-    defaultError:
-      description: Unexpected error.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '404':
-      description: Is returned when the specified resource can not be located.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '401':
-      description: Is returned when the authorization token provided is invalid or expired.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '403':
-      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
     '500':
       description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    defaultError:
+      description: Unexpected error.
       content:
         application/json:
           schema:
@@ -405,13 +348,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '401':
+      description: Is returned when the authorization token provided is invalid or expired.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
   parameters:
-    cursor:
-      name: cursor
-      in: query
-      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
-      schema:
-        type: string
     count:
       name: limit
       in: query
@@ -421,6 +376,51 @@ components:
         format: int32
         minimum: 1
         maximum: 100
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
+  requestBodies:
+    createWebhook:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: HTTPS URL of the resource to receive Webhook messages.
+                example: https://www.example.com/webhooks
+              namespace:
+                type: string
+                description: The namespace for the event types to receive.
+                example: alerts
+              enabled:
+                type: boolean
+                description: Whether the Webhook is actively receiving messages.
+                example: true
+    updateWebhook:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+                description: HTTPS URL of the resource to receive Webhook messages.
+                example: https://www.example.com/webhooks
+              namespace:
+                type: string
+                description: The namespace for the event types to receive.
+                example: alerts
+              enabled:
+                type: boolean
+                description: Whether the Webhook is actively receiving messages.
+                example: true
   securitySchemes:
     OAuth2:
       type: oauth2
