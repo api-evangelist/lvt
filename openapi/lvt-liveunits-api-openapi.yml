@@ -334,156 +334,6 @@ components:
             maxItems: 20
             items:
               $ref: '#/components/schemas/liveUnit'
-    paginated:
-      type: object
-      required:
-      - itemsPerPage
-      - nextCursorUri
-      - totalResults
-      properties:
-        itemsCount:
-          type: integer
-          format: int32
-          minimum: 0
-          description: Number of items returned in the response
-          example: 24
-        nextCursorUri:
-          type:
-          - string
-          - 'null'
-          format: uri
-          description: Full URL to fetch the values of the next page
-          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
-        totalResults:
-          type: integer
-          description: Total number of items in the collection being iterated
-          example: 1234
-    callInfo:
-      type: object
-      description: Information required to call a live unit
-      required:
-      - phoneNumber
-      - extension
-      - passcode
-      properties:
-        phoneNumber:
-          type: string
-          format: phone
-          description: The phone number to call in with
-          example: +1 (111) 111-1111
-        extension:
-          type: string
-          description: The extension to dial after calling in
-          example: 1234
-        passcode:
-          type: string
-          description: The passcode to enter when prompted
-          example: 1234
-    placement:
-      type: object
-      required:
-      - position
-      - mountUnit
-      description: Describes form and position of camera mount
-      properties:
-        position:
-          $ref: '#/components/schemas/cameraMountPosition'
-        mountUnit:
-          $ref: '#/components/schemas/mountUnit'
-    mountUnit:
-      type: object
-      required:
-      - id
-      - type
-      - gpsLocation
-      description: Describes form of camera mount
-      properties:
-        id:
-          type: string
-          description: The id of the mount unit
-        type:
-          type: string
-          description: Type of mount the camera is on
-          enum:
-          - liveUnit
-          - liveUnitSurroundHead
-        gpsLocation:
-          $ref: '#/components/schemas/gpsCoordinates'
-    cameraMountPosition:
-      type: string
-      description: The position of the camera on the live unit
-      enum:
-      - center
-      - left
-      - right
-      - unassigned
-      example: center
-    sound:
-      type: object
-      description: The information about a quick sound a live unit can play.
-      required:
-      - id
-      - name
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The ID of the sound.
-        name:
-          type: string
-          description: The human readable name of the sound.
-          example: Trespassing
-    cameras:
-      allOf:
-      - $ref: '#/components/schemas/paginated'
-      - type: object
-        required:
-        - cameras
-        properties:
-          items:
-            type: array
-            maxItems: 20
-            items:
-              $ref: '#/components/schemas/camera'
-    talkDownData:
-      type: object
-      description: Data required to initiate a talkdown session
-      required:
-      - wssUrl
-      - callId
-      properties:
-        wssUrl:
-          type: string
-          format: uri
-          description: 'The WebSocket url. Send audio as byte arrays of mono, Mulaw-encoded audio packets with a sample rate of 8KHz. Close the socket to end the talkdown session.
-
-            '
-          example: wss://talkdown.api.lvt.com?callId=456
-        callId:
-          type: string
-          description: A unique identifier for the talkdown session
-    lights:
-      allOf:
-      - $ref: '#/components/schemas/paginated'
-      - type: object
-        required:
-        - items
-        properties:
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/light'
-    sounds:
-      allOf:
-      - $ref: '#/components/schemas/paginated'
-      - type: object
-        required:
-        - items
-        properties:
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/sound'
     error:
       type: object
       required:
@@ -512,6 +362,95 @@ components:
           items:
             type: string
             example: 'login: An object with this field already exists in the current organization'
+    placement:
+      type: object
+      required:
+      - position
+      - mountUnit
+      description: Describes form and position of camera mount
+      properties:
+        position:
+          $ref: '#/components/schemas/cameraMountPosition'
+        mountUnit:
+          $ref: '#/components/schemas/mountUnit'
+    talkDownData:
+      type: object
+      description: Data required to initiate a talkdown session
+      required:
+      - wssUrl
+      - callId
+      properties:
+        wssUrl:
+          type: string
+          format: uri
+          description: 'The WebSocket url. Send audio as byte arrays of mono, Mulaw-encoded audio packets with a sample rate of 8KHz. Close the socket to end the talkdown session.
+
+            '
+          example: wss://talkdown.api.lvt.com?callId=456
+        callId:
+          type: string
+          description: A unique identifier for the talkdown session
+    lights:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/light'
+    gpsCoordinates:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: float
+          minimum: -90.0
+          maximum: 90.0
+          description: GPS Decimal Degrees Latitude
+          example: 40.123456
+        longitude:
+          type: number
+          format: float
+          minimum: -180.0
+          maximum: 180.0
+          description: GPS Decimal Degrees Longitude
+          example: -111.789
+    lightState:
+      type: string
+      enum:
+      - 'on'
+      - 'off'
+      - unavailable
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
     camera:
       type: object
       required:
@@ -581,6 +520,117 @@ components:
             position:
               type: boolean
               description: If the camera supports positional ptzf commands
+    sounds:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/sound'
+    callInfo:
+      type: object
+      description: Information required to call a live unit
+      required:
+      - phoneNumber
+      - extension
+      - passcode
+      properties:
+        phoneNumber:
+          type: string
+          format: phone
+          description: The phone number to call in with
+          example: +1 (111) 111-1111
+        extension:
+          type: string
+          description: The extension to dial after calling in
+          example: 1234
+        passcode:
+          type: string
+          description: The passcode to enter when prompted
+          example: 1234
+    cameras:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - cameras
+        properties:
+          items:
+            type: array
+            maxItems: 20
+            items:
+              $ref: '#/components/schemas/camera'
+    cameraMountPosition:
+      type: string
+      description: The position of the camera on the live unit
+      enum:
+      - center
+      - left
+      - right
+      - unassigned
+      example: center
+    light:
+      type: object
+      description: A light on a live unit.
+      required:
+      - id
+      - type
+      - state
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the light.
+        type:
+          type: string
+          description: The type of light
+          enum:
+          - strobe
+          - flood
+          - camera
+        state:
+          $ref: '#/components/schemas/lightState'
+        name:
+          type: string
+          description: Optional name to describe the light beyond the type
+    mountUnit:
+      type: object
+      required:
+      - id
+      - type
+      - gpsLocation
+      description: Describes form of camera mount
+      properties:
+        id:
+          type: string
+          description: The id of the mount unit
+        type:
+          type: string
+          description: Type of mount the camera is on
+          enum:
+          - liveUnit
+          - liveUnitSurroundHead
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
+    sound:
+      type: object
+      description: The information about a quick sound a live unit can play.
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the sound.
+        name:
+          type: string
+          description: The human readable name of the sound.
+          example: Trespassing
     liveUnit:
       type: object
       required:
@@ -607,65 +657,27 @@ components:
         name:
           type: string
           description: User assigned name for the live unit
-    gpsCoordinates:
-      type: object
-      required:
-      - latitude
-      - longitude
-      properties:
-        latitude:
-          type: number
-          format: float
-          minimum: -90.0
-          maximum: 90.0
-          description: GPS Decimal Degrees Latitude
-          example: 40.123456
-        longitude:
-          type: number
-          format: float
-          minimum: -180.0
-          maximum: 180.0
-          description: GPS Decimal Degrees Longitude
-          example: -111.789
-    lightState:
-      type: string
-      enum:
-      - 'on'
-      - 'off'
-      - unavailable
-    light:
-      type: object
-      description: A light on a live unit.
-      required:
-      - id
-      - type
-      - state
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The ID of the light.
-        type:
-          type: string
-          description: The type of light
-          enum:
-          - strobe
-          - flood
-          - camera
-        state:
-          $ref: '#/components/schemas/lightState'
-        name:
-          type: string
-          description: Optional name to describe the light beyond the type
   responses:
-    '500':
-      description: Is returned when processing encounters an error.
+    '409':
+      description: The current state of the server does not allow for the operation.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '409':
-      description: The current state of the server does not allow for the operation.
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
       content:
         application/json:
           schema:
@@ -682,25 +694,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '404':
-      description: Is returned when the specified resource can not be located.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '403':
-      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
   parameters:
-    cursor:
-      name: cursor
-      in: query
-      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
-      schema:
-        type: string
     count:
       name: limit
       in: query
@@ -710,6 +704,12 @@ components:
         format: int32
         minimum: 1
         maximum: 100
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
   requestBodies:
     updateLiveUnitLight:
       content:
