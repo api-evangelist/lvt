@@ -239,93 +239,19 @@ paths:
       operationId: postWebhooks:test
       x-operation-id-source: derived
 components:
-  responses:
-    '404':
-      description: Is returned when the specified resource can not be located.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '403':
-      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    defaultError:
-      description: Unexpected error.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '400':
-      description: Is returned when the request is formatted improperly.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '401':
-      description: Is returned when the authorization token provided is invalid or expired.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '500':
-      description: Is returned when processing encounters an error.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
   schemas:
-    paginated:
-      type: object
-      required:
-      - itemsPerPage
-      - nextCursorUri
-      - totalResults
-      properties:
-        itemsCount:
-          type: integer
-          format: int32
-          minimum: 0
-          description: Number of items returned in the response
-          example: 24
-        nextCursorUri:
-          type:
-          - string
-          - 'null'
-          format: uri
-          description: Full URL to fetch the values of the next page
-          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
-        totalResults:
-          type: integer
-          description: Total number of items in the collection being iterated
-          example: 1234
-    webhook:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The UUID of the Webhook.
-        url:
-          type: string
-          format: uri
-          description: HTTPS URL of the resource to receive webhook messages.
-          example: https://api.example.com/receiveWebhook
-        namespace:
-          type: string
-          description: The namespace for the event types to receive.
-          example: securityAlerts
-        enabled:
-          type: boolean
-          description: Whether the Webhooks is actively receiving messages.
-          example: true
-        created:
-          type: string
-          format: date-time
-          description: ISO 8601 formatted string. Represents the `timestamp` at which the webhook was created.
-          example: 2023-01-01 12:00:00+00:00
+    webhooks:
+      allOf:
+      - $ref: '#/components/schemas/paginated'
+      - type: object
+        required:
+        - items
+        properties:
+          items:
+            type: array
+            maxItems: 100
+            items:
+              $ref: '#/components/schemas/webhook'
     error:
       type: object
       required:
@@ -354,18 +280,108 @@ components:
           items:
             type: string
             example: 'login: An object with this field already exists in the current organization'
-    webhooks:
-      allOf:
-      - $ref: '#/components/schemas/paginated'
-      - type: object
-        required:
-        - items
-        properties:
-          items:
-            type: array
-            maxItems: 100
-            items:
-              $ref: '#/components/schemas/webhook'
+    webhook:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The UUID of the Webhook.
+        url:
+          type: string
+          format: uri
+          description: HTTPS URL of the resource to receive webhook messages.
+          example: https://api.example.com/receiveWebhook
+        namespace:
+          type: string
+          description: The namespace for the event types to receive.
+          example: securityAlerts
+        enabled:
+          type: boolean
+          description: Whether the Webhooks is actively receiving messages.
+          example: true
+        created:
+          type: string
+          format: date-time
+          description: ISO 8601 formatted string. Represents the `timestamp` at which the webhook was created.
+          example: 2023-01-01 12:00:00+00:00
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
+  responses:
+    '400':
+      description: Is returned when the request is formatted improperly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    defaultError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '401':
+      description: Is returned when the authorization token provided is invalid or expired.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '403':
+      description: Is returned when the requested resource is not currently accessible with the provided authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '500':
+      description: Is returned when processing encounters an error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  parameters:
+    count:
+      name: limit
+      in: query
+      description: Limit reply list page size.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
   requestBodies:
     updateWebhook:
       content:
@@ -405,22 +421,6 @@ components:
                 type: boolean
                 description: Whether the Webhook is actively receiving messages.
                 example: true
-  parameters:
-    count:
-      name: limit
-      in: query
-      description: Limit reply list page size.
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
-    cursor:
-      name: cursor
-      in: query
-      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
-      schema:
-        type: string
   securitySchemes:
     OAuth2:
       type: oauth2

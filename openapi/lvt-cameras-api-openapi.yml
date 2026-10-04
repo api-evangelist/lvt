@@ -265,6 +265,54 @@ paths:
           $ref: '#/components/responses/defaultError'
 components:
   schemas:
+    cameraPosition:
+      type: object
+      properties:
+        pan:
+          description: Pan value.
+          type: number
+          format: float
+          minimum: -360
+          maximum: 360
+        tilt:
+          description: Tilt value.
+          type: number
+          format: float
+          minimum: -360
+          maximum: 360
+        zoom:
+          description: Zoom value.
+          type: number
+          format: float
+          minimum: -100
+          maximum: 100
+        focus:
+          description: Focus value.
+          type:
+          - number
+          - 'null'
+          format: float
+          minimum: -100
+          maximum: 100
+    mountUnit:
+      type: object
+      required:
+      - id
+      - type
+      - gpsLocation
+      description: Describes form of camera mount
+      properties:
+        id:
+          type: string
+          description: The id of the mount unit
+        type:
+          type: string
+          description: Type of mount the camera is on
+          enum:
+          - liveUnit
+          - liveUnitSurroundHead
+        gpsLocation:
+          $ref: '#/components/schemas/gpsCoordinates'
     streamProtocols:
       allOf:
       - $ref: '#/components/schemas/paginated'
@@ -276,6 +324,101 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/streamProtocol'
+    streamDataPoly:
+      oneOf:
+      - $ref: '#/components/schemas/streamDataRtsp'
+      - $ref: '#/components/schemas/streamDataWebrtc'
+      discriminator:
+        propertyName: protocol
+        mapping:
+          rtsp: '#/components/schemas/streamDataRtsp'
+          webrtc: '#/components/schemas/streamDataWebrtc'
+    paginated:
+      type: object
+      required:
+      - itemsPerPage
+      - nextCursorUri
+      - totalResults
+      properties:
+        itemsCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Number of items returned in the response
+          example: 24
+        nextCursorUri:
+          type:
+          - string
+          - 'null'
+          format: uri
+          description: Full URL to fetch the values of the next page
+          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
+        totalResults:
+          type: integer
+          description: Total number of items in the collection being iterated
+          example: 1234
+    error:
+      type: object
+      required:
+      - errorCode
+      - errorSummary
+      - errorId
+      - errorCause
+      properties:
+        errorCode:
+          type: string
+          description: A code that is associated with this error type
+          example: E0000001
+        errorSummary:
+          type: string
+          description: A natural language explanation of the error
+          example: Api validation failed
+        errorId:
+          type: string
+          description: 'An ID that identifies this request.  These IDs are mapped to the internal error on the server side to assist in troubleshooting.
+
+            '
+          example: oaeHfmOAx1iRLa0H10DeMz5fQ
+        errorCauses:
+          type: array
+          description: Further information about what caused this error. Should be empty array if no causes given.
+          items:
+            type: string
+            example: 'login: An object with this field already exists in the current organization'
+    streamDataWebrtc:
+      type: object
+      properties:
+        protocol:
+          type: string
+          description: A short name for the streaming protocol
+          example: webrtc
+        refreshInterval:
+          type: integer
+          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
+          format: int32
+        signalUrl:
+          type: string
+          description: web socket url to the signal server
+          format: uri
+        streamId:
+          description: Identifier for the current stream
+          type: string
+          format: uuid
+        streamInfo:
+          description: Data that is passed to to the signal server
+          type: object
+          additionalProperties: true
+    placement:
+      type: object
+      required:
+      - position
+      - mountUnit
+      description: Describes form and position of camera mount
+      properties:
+        position:
+          $ref: '#/components/schemas/cameraMountPosition'
+        mountUnit:
+          $ref: '#/components/schemas/mountUnit'
     cameraPositionPut:
       type: object
       required:
@@ -308,34 +451,6 @@ components:
           format: int32
           minimum: -1
           maximum: 10000
-    error:
-      type: object
-      required:
-      - errorCode
-      - errorSummary
-      - errorId
-      - errorCause
-      properties:
-        errorCode:
-          type: string
-          description: A code that is associated with this error type
-          example: E0000001
-        errorSummary:
-          type: string
-          description: A natural language explanation of the error
-          example: Api validation failed
-        errorId:
-          type: string
-          description: 'An ID that identifies this request.  These IDs are mapped to the internal error on the server side to assist in troubleshooting.
-
-            '
-          example: oaeHfmOAx1iRLa0H10DeMz5fQ
-        errorCauses:
-          type: array
-          description: Further information about what caused this error. Should be empty array if no causes given.
-          items:
-            type: string
-            example: 'login: An object with this field already exists in the current organization'
     streamDataRtsp:
       type: object
       properties:
@@ -355,55 +470,35 @@ components:
           type: string
           description: Identifier for the current stream
           format: uuid
-    placement:
+    gpsCoordinates:
       type: object
       required:
-      - position
-      - mountUnit
-      description: Describes form and position of camera mount
+      - latitude
+      - longitude
       properties:
-        position:
-          $ref: '#/components/schemas/cameraMountPosition'
-        mountUnit:
-          $ref: '#/components/schemas/mountUnit'
-    cameraPosition:
-      type: object
-      properties:
-        pan:
-          description: Pan value.
+        latitude:
           type: number
           format: float
-          minimum: -360
-          maximum: 360
-        tilt:
-          description: Tilt value.
+          minimum: -90.0
+          maximum: 90.0
+          description: GPS Decimal Degrees Latitude
+          example: 40.123456
+        longitude:
           type: number
           format: float
-          minimum: -360
-          maximum: 360
-        zoom:
-          description: Zoom value.
-          type: number
-          format: float
-          minimum: -100
-          maximum: 100
-        focus:
-          description: Focus value.
-          type:
-          - number
-          - 'null'
-          format: float
-          minimum: -100
-          maximum: 100
-    streamDataPoly:
-      oneOf:
-      - $ref: '#/components/schemas/streamDataRtsp'
-      - $ref: '#/components/schemas/streamDataWebrtc'
-      discriminator:
-        propertyName: protocol
-        mapping:
-          rtsp: '#/components/schemas/streamDataRtsp'
-          webrtc: '#/components/schemas/streamDataWebrtc'
+          minimum: -180.0
+          maximum: 180.0
+          description: GPS Decimal Degrees Longitude
+          example: -111.789
+    cameraMountPosition:
+      type: string
+      description: The position of the camera on the live unit
+      enum:
+      - center
+      - left
+      - right
+      - unassigned
+      example: center
     camera:
       type: object
       required:
@@ -473,101 +568,6 @@ components:
             position:
               type: boolean
               description: If the camera supports positional ptzf commands
-    gpsCoordinates:
-      type: object
-      required:
-      - latitude
-      - longitude
-      properties:
-        latitude:
-          type: number
-          format: float
-          minimum: -90.0
-          maximum: 90.0
-          description: GPS Decimal Degrees Latitude
-          example: 40.123456
-        longitude:
-          type: number
-          format: float
-          minimum: -180.0
-          maximum: 180.0
-          description: GPS Decimal Degrees Longitude
-          example: -111.789
-    paginated:
-      type: object
-      required:
-      - itemsPerPage
-      - nextCursorUri
-      - totalResults
-      properties:
-        itemsCount:
-          type: integer
-          format: int32
-          minimum: 0
-          description: Number of items returned in the response
-          example: 24
-        nextCursorUri:
-          type:
-          - string
-          - 'null'
-          format: uri
-          description: Full URL to fetch the values of the next page
-          example: https://api.lvt.com/v1/liveUnits?cursor=eyJhZnRlciI6IjQyIn0=
-        totalResults:
-          type: integer
-          description: Total number of items in the collection being iterated
-          example: 1234
-    streamDataWebrtc:
-      type: object
-      properties:
-        protocol:
-          type: string
-          description: A short name for the streaming protocol
-          example: webrtc
-        refreshInterval:
-          type: integer
-          description: Interval in milliseconds in which the /stream/{streamId}:checkIn request should be called
-          format: int32
-        signalUrl:
-          type: string
-          description: web socket url to the signal server
-          format: uri
-        streamId:
-          description: Identifier for the current stream
-          type: string
-          format: uuid
-        streamInfo:
-          description: Data that is passed to to the signal server
-          type: object
-          additionalProperties: true
-    cameraMountPosition:
-      type: string
-      description: The position of the camera on the live unit
-      enum:
-      - center
-      - left
-      - right
-      - unassigned
-      example: center
-    mountUnit:
-      type: object
-      required:
-      - id
-      - type
-      - gpsLocation
-      description: Describes form of camera mount
-      properties:
-        id:
-          type: string
-          description: The id of the mount unit
-        type:
-          type: string
-          description: Type of mount the camera is on
-          enum:
-          - liveUnit
-          - liveUnitSurroundHead
-        gpsLocation:
-          $ref: '#/components/schemas/gpsCoordinates'
     streamProtocol:
       type: object
       required:
@@ -581,26 +581,32 @@ components:
           - webrtc
           - rtsp
   responses:
+    '404':
+      description: Is returned when the specified resource can not be located.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    '503':
+      description: Is returned when processing is unable to access a needed resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
     '409':
       description: The current state of the server does not allow for the operation.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '406':
-      description: Is returned when "Accept" header has not been specified or does not contain the value "application/json".
+    '400':
+      description: Is returned when the request is formatted improperly.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
     '403':
       description: Is returned when the requested resource is not currently accessible with the provided authorization token.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '404':
-      description: Is returned when the specified resource can not be located.
       content:
         application/json:
           schema:
@@ -617,25 +623,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
+    '406':
+      description: Is returned when "Accept" header has not been specified or does not contain the value "application/json".
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
     defaultError:
       description: Unexpected error.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    '503':
-      description: Is returned when processing is unable to access a needed resource.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    '400':
-      description: Is returned when the request is formatted improperly.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
   parameters:
+    cursor:
+      name: cursor
+      in: query
+      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
+      schema:
+        type: string
     count:
       name: limit
       in: query
@@ -645,12 +651,6 @@ components:
         format: int32
         minimum: 1
         maximum: 100
-    cursor:
-      name: cursor
-      in: query
-      description: Used to populate a paged response. Do not provide on initial request. Reserved for use by backend to paginate.
-      schema:
-        type: string
   requestBodies:
     startStream:
       content:
