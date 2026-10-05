@@ -1,0 +1,12 @@
+{
+ "url": "https://raw.githubusercontent.com/LiveViewTech/lvt-public-api/refs/heads/master/api-specs/api.yaml",
+ "requested_url": "https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml?raw=true",
+ "status": 200,
+ "content_type": "text/plain; charset=utf-8",
+ "bytes": 73152,
+ "sha256": "b77a3ae9a48c43b3287272b45f5c643de43e9136d3b64123a8f43f944431c247",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 0.917), but the bytes differ, so the archive is an earlier or reformatted copy."
+}
