@@ -50,3 +50,25 @@ api_pricing:
     No published price, tier or quota for the Partner API itself. The API manual states the prerequisites
     are "an account with LVT" and "a partnership agreement with LVT", and that access is requested by
     emailing integrations@lvt.com — a sales-gated, unpriced surface.
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - negotiated
+  - subscription
+  units: []
+  plans:
+  - name: Site Awareness Focused MSU
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods:
+    - year
+  - name: Security & Intelligence Focused MSU
+    access: other
+    model: negotiated
+    model_how: derived
+    units: []
+    periods:
+    - year
