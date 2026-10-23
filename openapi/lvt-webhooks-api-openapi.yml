@@ -431,3 +431,9 @@ components:
             account.liveUnits.manage: Edit a live units data
             account.cameras.manage: Edit a cameras data
             account.locations.manage: Edit a locations data
+x-provenance:
+  method: harvested
+  publisher: LVT
+  source: https://raw.githubusercontent.com/LiveViewTech/lvt-public-api/refs/heads/master/api-specs/api.yaml
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
