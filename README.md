@@ -64,5 +64,144 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-LVT is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://forgeglobal.com/lvt_stock/
+LVT (LiveView Technologies) is an American physical-security company that builds solar-powered, cellular-connected mobile surveillance units (MSUs) and the SaaS/PaaS platform that runs them — live video, AI analytics, alerting, lights, loudspeakers and AI talk-down — for retail, commercial, industrial, critical-infrastructure and public-sector sites. Founded in 2005 and headquartered in American Fork, Utah, LVT publishes a public Partner API: a REST service over JSON, described by a first-party OpenAPI 3.0.3 document on GitHub, that lets SOC operators and integrators list live units and locations, control cameras (pan/tilt/zoom), start RTSP and WebRTC streams through the LVT camera relay, play sounds, toggle lights, initiate speaker talk-down, review and resolve security alert events, fetch signed media URLs, and register HMAC-signed webhooks. The same API backs LVT's pre-built integrations with Immix, Axon Fusus and Genetec Security Center, and LVT units also present themselves to third-party VMS platforms as ONVIF cameras.
+
+**Areas:** Company · Physical Security · Video Surveillance · Camera · Video Streaming · WebRTC · RTSP · ONVIF · IoT · Alerts · Webhook · Public Safety
+
+## LVT on APIs.io
+
+Everything profiled for LVT is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/lvt/](https://apis.io/providers/lvt/)** — or go straight to one of the APIs or properties below.
+
+### APIs (9)
+
+- [LVT Cameras API](https://apis.io/apis/lvt/lvt-cameras-api/) — Operations on cameras
+- [LVT Events API](https://apis.io/apis/lvt/lvt-events-api/) — The Events API from LVT — 5 operation(s) for events.
+- [LVT Live Units API](https://apis.io/apis/lvt/lvt-liveunits-api/) — Operations on LiveUnits
+- [LVT Locations API](https://apis.io/apis/lvt/lvt-locations-api/) — Operations on locations
+- [LVT Media API](https://apis.io/apis/lvt/lvt-media-api/) — The Media API from LVT — 1 operation(s) for media.
+- [LVT Streams API](https://apis.io/apis/lvt/lvt-streams-api/) — The Streams API from LVT — 3 operation(s) for streams.
+- [LVT Talkdown API](https://apis.io/apis/lvt/lvt-talkdown-api/) — Operations related to Partner Talkdown
+- [LVT Webhooks API](https://apis.io/apis/lvt/lvt-webhooks-api/) — Operations on webhooks
+- [LVT Public Keys API](https://apis.io/apis/lvt/lvt-public-keys-api/) — Operations related to outbound message verification
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Lvt Webhooks](https://apis.io/asyncapis/lvt/lvt-webhooks/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [lvt](https://apis.io/servers/lvt/lvt/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Lvt Partner Api Overlay](https://apis.io/overlays/lvt/lvt-partner-api-overlay/)
+
+#### Security (4)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Lvt Authentication](https://apis.io/security/lvt/lvt-authentication/)
+- [Lvt Domain Security](https://apis.io/security/lvt/lvt-domain-security/)
+- [Lvt Trust Center](https://apis.io/security/lvt/lvt-trust-center/)
+- [Lvt Vulnerability Disclosure](https://apis.io/security/lvt/lvt-vulnerability-disclosure/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Lvt Scopes](https://apis.io/scopes/lvt/lvt-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Lvt Plans Pricing](https://apis.io/plans/lvt/lvt-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Lvt Rate Limits](https://apis.io/rate-limits/lvt/lvt-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.lvt.com/)
+- [Documentation](https://docs.lvt.com/r/lvt-partner-api-manual)
+- [Getting started](https://github.com/LiveViewTech/lvt-public-api)
+- [API reference](https://github.com/LiveViewTech/lvt-public-api/blob/master/api-specs/api.yaml)
+- [Pricing](https://www.lvt.com/pricing)
+- [Sign up](https://vms.liveviewtech.com/)
+- [Support](https://www.lvt.com/contact)
+- [Blog](https://www.lvt.com/blog)
+- [Trust centre](https://trust.lvt.com/)
+- [Terms of service](https://www.lvt.com/legal/msa)
+- [Privacy policy](https://www.lvt.com/legal/privacy)
+- [GitHub](https://github.com/LiveViewTech)
+- [Status](https://status.lvt.com/)
+
+## API Evangelist rating
+
+**Kin Score 54.8** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 60.3 |
+| Contract governance | 18.2 |
+| Operational transparency | 36.8 |
+| Developer ergonomics | 39.9 |
+| Access clarity | 68.4 |
+
+**Agent readiness 29.8** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | negotiable (partial credit) |
+| Idempotency | — |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | mostly |
+
+**Regulatory alignment 45.1** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/lvt/](https://apis.io/providers/lvt/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for LVT: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/lvt/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
